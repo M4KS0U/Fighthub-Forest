@@ -1,0 +1,25 @@
+[Libraries]
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Ll]ogs/
+
+# Autres fichiers locaux
+/[Uu]ser[Ss]ettings/
+*.csproj
+*.pidb
+*.suo
+*.user
+*.userprefs
+*.unityproj
+*.sav
+*.svd
+
+.vscode/
+.idea/
+.plastic/
+ignore.conf
+
+# Fichiers cache
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
