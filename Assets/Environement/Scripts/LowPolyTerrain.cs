@@ -131,6 +131,7 @@ public class LowPolyTerrain : MonoBehaviour
         transform.GetComponent<MeshFilter>().mesh = terrainMesh;
         transform.GetComponent<MeshCollider>().sharedMesh = terrainMesh;
         transform.GetComponent<MeshRenderer>().material = material;
+        
     }
 
     private Color EvaluateColor(Triangle triangle)
