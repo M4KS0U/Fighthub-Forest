@@ -16,5 +16,11 @@ public class GridSpawnerEditor : Editor
             // Appelle la méthode SpawnGrid de GridSpawner
             gridSpawner.SpawnGrid();
         }
+
+        if (GUILayout.Button("Destroy Children"))
+        {
+            // Appelle la méthode DestroyChildren de GridSpawner
+            gridSpawner.DestroyChildren();
+        }
     }
 }

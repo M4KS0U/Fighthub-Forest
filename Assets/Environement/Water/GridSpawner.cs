@@ -6,13 +6,17 @@ public class GridSpawner : MonoBehaviour
     public int gridSize = 5; // Nombre d'objets par côté
     public float offset = 1.0f; // Espacement entre les objets
 
+    public void DestroyChildren()
+    {
+        while (transform.childCount > 0)
+        {
+            DestroyImmediate(transform.GetChild(0).gameObject);
+        }
+    }
+
     public void SpawnGrid()
     {
-        // Supprime tous les enfants de l'objet qui contient le script
-        foreach (Transform child in transform)
-        {
-            DestroyImmediate(child.gameObject);
-        }
+        DestroyChildren();
 
         // Calcule le point de départ pour le quadrillage
         Vector3 startPosition = transform.position - new Vector3((gridSize - 1) * offset / 2, 0, (gridSize - 1) * offset / 2);
