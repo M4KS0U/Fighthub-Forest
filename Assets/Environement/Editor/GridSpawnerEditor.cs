@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(GridSpawner))]
-public class GridSpawnerEditor : Editor
+[UnityEditor.CustomEditor(typeof(GridSpawner))]
+public class GridSpawnerEditor : UnityEditor.Editor
 {
     public override void OnInspectorGUI()
     {

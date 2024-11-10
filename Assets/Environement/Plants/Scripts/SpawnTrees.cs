@@ -38,7 +38,9 @@ public class SpawnTree : MonoBehaviour
                 if (IsPreferredLocation(hit, slopeAngle) && IsNotTooClose(hit.point))
                 {
                     spawnPoints.Add(hit.point);
-                } else {
+                }
+                else
+                {
                     Debug.DrawRay(randomPoint, Vector3.down * maxRaycastDistance, Color.red, 1f);
                 }
             }
@@ -66,7 +68,7 @@ public class SpawnTree : MonoBehaviour
             Vector3 averageColorVector = new Vector3(averageColor.r, averageColor.g, averageColor.b);
 
             averageColorVector.Normalize();
-            
+
             // more its green, more it's a good spot
             if (averageColorVector.y < 0.75) return false;
             return true;
