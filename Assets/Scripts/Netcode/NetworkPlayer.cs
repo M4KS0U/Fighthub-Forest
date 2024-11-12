@@ -32,9 +32,23 @@ namespace Netcode
 
         private CharacterController _controller;
         private StarterAssetsInputs _input;
+#if ENABLE_INPUT_SYSTEM 
         private PlayerInput _playerInput;
+#endif
         private Animator _animator;
         private GameObject _mainCamera;
+
+        private bool IsCurrentDeviceMouse
+        {
+            get
+            {
+#if ENABLE_INPUT_SYSTEM
+                return _playerInput.currentControlScheme == "KeyboardMouse";
+#else
+				return false;
+#endif
+            }
+        }
 
         private float _verticalVelocity;
         private float _jumpTimeoutDelta;
@@ -50,6 +64,7 @@ namespace Netcode
         private float _rotationVelocity;
         private float _animationBlend;
         private float _targetRotation = 0.0f;
+        private bool _spawnedGrounded;
 
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
 
@@ -65,17 +80,31 @@ namespace Netcode
 
         public override void OnNetworkSpawn()
         {
-            if (IsOwner)
+            if (IsServer)
             {
-                // Set initial position to a grounded location
+                // Only the server sets the initial position
                 Vector3 startPosition = GetRandomPositionOnMap();
                 transform.position = startPosition;
-                Position.Value = startPosition;
-                Debug.Log("startPos = " + startPosition);
+                Position.Value = startPosition; // Sync position to clients
 
-                // Reset the jump and fall timeouts
+                _spawnedGrounded = false;
+                _verticalVelocity = -2f;
                 _jumpTimeoutDelta = JumpTimeout;
                 _fallTimeoutDelta = FallTimeout;
+            }
+            else
+            {
+                // Wait for position update from server
+                Position.OnValueChanged += OnPositionChanged;
+            }
+        }
+
+        private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
+        {
+            // Only non-owners update position when it's updated from the server
+            if (!IsOwner)
+            {
+                transform.position = newPosition;
             }
         }
 
@@ -83,7 +112,11 @@ namespace Netcode
         {
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
+#if ENABLE_INPUT_SYSTEM 
             _playerInput = GetComponent<PlayerInput>();
+#else
+			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
+#endif
             _animator = GetComponent<Animator>();
             _hasAnimator = _animator != null;
 
@@ -106,16 +139,29 @@ namespace Netcode
         {
             if (IsOwner)
             {
+                _playerInput.enabled = true;
+                _input.enabled = true;
+            }
+            else
+            {
+                _playerInput.enabled = false;
+                _input.enabled = false;
+            }
+            if (IsOwner)
+            {
                 GroundedCheck();
                 HandleGravityAndJumping();
                 Move();
 
-                Debug.Log("transform.pos = " + transform.position);
-                Position.Value = transform.position; // Sync position
+                if (IsServer)
+                {
+                    Position.Value = transform.position; // Sync position to clients
+                }
             }
             else
             {
-                transform.position = Position.Value; // Update position for non-owners
+                // Non-owners follow the server-synced position
+                transform.position = Position.Value;
             }
 
             UpdateAnimator();
@@ -123,7 +169,7 @@ namespace Netcode
 
         private void GroundedCheck()
         {
-            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
+            Vector3 spherePosition = new Vector3(Position.Value.x, Position.Value.y - GroundedOffset, Position.Value.z);
             Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 
             if (_hasAnimator)
@@ -164,8 +210,14 @@ namespace Netcode
             }
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-            Debug.Log(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            if (_spawnedGrounded)
+            {
+                _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            }
+            else
+            {
+                _spawnedGrounded = true;
+            }
         }
 
         private void HandleGravityAndJumping()

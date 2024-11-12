@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Unity.Netcode;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
  */
 
 namespace StarterAssets
-{/**
+{
     [RequireComponent(typeof(CharacterController))]
 #if ENABLE_INPUT_SYSTEM 
     [RequireComponent(typeof(PlayerInput))]
@@ -400,5 +400,5 @@ namespace StarterAssets
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
         }
-    }**/
+    }
 }

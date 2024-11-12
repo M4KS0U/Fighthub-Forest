@@ -32,25 +32,29 @@ public class PlayerFollowCamera : MonoBehaviour
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
             // We only want to set the camera to follow the local player
-            SetCameraToFollowPlayer();
+            Invoke(nameof(SetCameraToFollowLocalPlayer), 0.1f);
         }
     }
 
-    private void SetCameraToFollowPlayer()
+    private void SetCameraToFollowLocalPlayer()
     {
-        // Find the player's object (assuming it has a "Player" tag or other identifier)
-        GameObject player = GameObject.FindWithTag("Player");
+        // Find all objects with the "Player" tag and look for the local player
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            NetworkBehaviour networkBehaviour = player.GetComponent<NetworkBehaviour>();
+            
+            if (networkBehaviour != null && networkBehaviour.IsOwner)
+            {
+                // Set the virtual camera to follow and look at the local player
+                virtualCamera.Follow = player.transform;
+                virtualCamera.LookAt = player.transform;
+                Debug.Log("Camera now following the local player.");
+                return;
+            }
+        }
         
-        if (player != null)
-        {
-            // Set the virtual camera to follow and look at the player
-            virtualCamera.Follow = player.transform;
-            virtualCamera.LookAt = player.transform;
-            Debug.Log("Camera now following and looking at the player.");
-        }
-        else
-        {
-            Debug.LogWarning("Player not found. Ensure player prefab has the 'Player' tag or appropriate identifier.");
-        }
+        Debug.LogWarning("Local player not found. Ensure player prefab has the 'Player' tag.");
     }
 }
