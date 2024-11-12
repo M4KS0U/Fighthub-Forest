@@ -1753,7 +1753,6 @@ GameObject:
   - component: {fileID: 8745945043615646908}
   - component: {fileID: 3957850053915284256}
   - component: {fileID: 1012419377093167638}
-  - component: {fileID: -2404878562945545468}
   - component: {fileID: -4172464154467714127}
   - component: {fileID: -4011269157929970127}
   m_Layer: 8
@@ -1980,23 +1979,11 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: e4ce1614-c754-48c1-9103-33130441661f
     m_ActionName: UI/New action
-  m_NeverAutoSwitchControlSchemes: 0
+  m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: KeyboardMouse
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &-2404878562945545468
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3538692559444755151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4ff68dc032190a45b9cd356348ec5bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &-4172464154467714127
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2038,6 +2025,14 @@ MonoBehaviour:
     m_Bits: 5
   Position:
     m_InternalValue: {x: 0, y: 0, z: 0}
+  NetworkedSpeed:
+    m_InternalValue: 0
+  NetworkedGrounded:
+    m_InternalValue: 0
+  NetworkedJump:
+    m_InternalValue: 0
+  NetworkedFreeFall:
+    m_InternalValue: 0
 --- !u!114 &-4011269157929970127
 MonoBehaviour:
   m_ObjectHideFlags: 0
