@@ -45,7 +45,7 @@ namespace Netcode
 #if ENABLE_INPUT_SYSTEM
                 return _playerInput.currentControlScheme == "KeyboardMouse";
 #else
-				return false;
+                return false;
 #endif
             }
         }
@@ -66,7 +66,12 @@ namespace Netcode
         private float _targetRotation = 0.0f;
         private bool _spawnedGrounded;
 
+        // Networked variables to sync animation
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
+        public NetworkVariable<float> NetworkedSpeed = new NetworkVariable<float>();
+        public NetworkVariable<bool> NetworkedGrounded = new NetworkVariable<bool>();
+        public NetworkVariable<bool> NetworkedJump = new NetworkVariable<bool>();
+        public NetworkVariable<bool> NetworkedFreeFall = new NetworkVariable<bool>();
 
         private bool _hasAnimator;
 
@@ -82,10 +87,9 @@ namespace Netcode
         {
             if (IsServer)
             {
-                // Only the server sets the initial position
                 Vector3 startPosition = GetRandomPositionOnMap();
                 transform.position = startPosition;
-                Position.Value = startPosition; // Sync position to clients
+                Position.Value = startPosition;
 
                 _spawnedGrounded = false;
                 _verticalVelocity = -2f;
@@ -94,14 +98,12 @@ namespace Netcode
             }
             else
             {
-                // Wait for position update from server
                 Position.OnValueChanged += OnPositionChanged;
             }
         }
 
         private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
         {
-            // Only non-owners update position when it's updated from the server
             if (!IsOwner)
             {
                 transform.position = newPosition;
@@ -115,7 +117,7 @@ namespace Netcode
 #if ENABLE_INPUT_SYSTEM 
             _playerInput = GetComponent<PlayerInput>();
 #else
-			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
+            Debug.LogError("Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
             _animator = GetComponent<Animator>();
             _hasAnimator = _animator != null;
@@ -135,32 +137,41 @@ namespace Netcode
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
         }
 
+        [ServerRpc]
+        private void UpdateAnimationParametersServerRpc(float speed, bool grounded, bool jump, bool freeFall)
+        {
+            // Server updates the networked values
+            NetworkedSpeed.Value = speed;
+            NetworkedGrounded.Value = grounded;
+            NetworkedJump.Value = jump;
+            NetworkedFreeFall.Value = freeFall;
+        }
+
         private void Update()
         {
             if (IsOwner)
             {
                 _playerInput.enabled = true;
                 _input.enabled = true;
-            }
-            else
-            {
-                _playerInput.enabled = false;
-                _input.enabled = false;
-            }
-            if (IsOwner)
-            {
+
                 GroundedCheck();
                 HandleGravityAndJumping();
                 Move();
 
+                // Sync position and animation variables only if we're the owner
                 if (IsServer)
                 {
-                    Position.Value = transform.position; // Sync position to clients
+                    Position.Value = transform.position;
                 }
+
+                // Send updated animation parameters to the server via RPC
+                UpdateAnimationParametersServerRpc(_animationBlend, Grounded, _animator.GetBool(_animIDJump), _animator.GetBool(_animIDFreeFall));
             }
             else
             {
-                // Non-owners follow the server-synced position
+                // For non-owners, disable input and just follow the server-synced position
+                _playerInput.enabled = false;
+                _input.enabled = false;
                 transform.position = Position.Value;
             }
 
@@ -271,8 +282,19 @@ namespace Netcode
         {
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, _input.analogMovement ? _input.move.magnitude : 1f);
+                if (IsOwner)
+                {
+                    _animator.SetFloat(_animIDSpeed, _animationBlend);
+                    _animator.SetFloat(_animIDMotionSpeed, _input.analogMovement ? _input.move.magnitude : 1f);
+                }
+                else
+                {
+                    _animator.SetFloat(_animIDSpeed, NetworkedSpeed.Value);
+                    _animator.SetFloat(_animIDMotionSpeed, 1f);
+                    _animator.SetBool(_animIDGrounded, NetworkedGrounded.Value);
+                    _animator.SetBool(_animIDJump, NetworkedJump.Value);
+                    _animator.SetBool(_animIDFreeFall, NetworkedFreeFall.Value);
+                }
             }
         }
 
