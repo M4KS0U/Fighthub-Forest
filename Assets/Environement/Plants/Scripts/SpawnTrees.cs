@@ -9,6 +9,9 @@ public class SpawnTree : MonoBehaviour
     public float maxSlope = 30f; // Maximum inclination in degrees
     public float maxRaycastDistance = 100f;
 
+    public float minScale = 0.8f;
+    public float maxScale = 1.2f;
+
     private List<Vector3> spawnPoints = new List<Vector3>();
 
     void Start()
@@ -92,7 +95,7 @@ public class SpawnTree : MonoBehaviour
             GameObject tree = Instantiate(treePrefab, spawnPoint, Quaternion.identity);
 
             // Randomize scale
-            float randomScale = Random.Range(0.8f, 1.2f);
+            float randomScale = Random.Range(minScale, maxScale);
             tree.transform.localScale *= randomScale;
 
             // Randomize rotation
