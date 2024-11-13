@@ -2,6 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using StarterAssets;
+using System.Collections;
 
 namespace Netcode
 {
@@ -85,21 +86,40 @@ namespace Netcode
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer)
+            if (IsOwner)
             {
-                Vector3 startPosition = GetRandomPositionOnMap();
-                transform.position = startPosition;
-                Position.Value = startPosition;
-
-                _spawnedGrounded = false;
-                _verticalVelocity = -2f;
-                _jumpTimeoutDelta = JumpTimeout;
-                _fallTimeoutDelta = FallTimeout;
+                // Only enable input for the owner, after a short delay to ensure connection
+                StartCoroutine(EnableInputAfterConnection());
             }
             else
             {
+                // Disable input for non-owners
+                if (_playerInput && _input) {
+                    _playerInput.enabled = false;
+                    _input.enabled = false;
+                }
+            }
+
+            if (IsServer)
+            {
+                // Server initializes position and sets listeners for all players
+                Vector3 startPosition = GetRandomPositionOnMap();
+                transform.position = startPosition;
+                Position.Value = startPosition;
+            }
+            else
+            {
+                // Clients subscribe to position updates from the server
                 Position.OnValueChanged += OnPositionChanged;
             }
+        }
+
+        // Coroutine to delay input activation for owner client
+        private IEnumerator EnableInputAfterConnection()
+        {
+            yield return new WaitForSeconds(0.5f); // Delay to ensure client connection
+            _playerInput.enabled = true;
+            _input.enabled = true;
         }
 
         private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
@@ -137,7 +157,7 @@ namespace Netcode
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
         }
 
-        [ServerRpc]
+        [ServerRpc(RequireOwnership = false)]
         private void UpdateAnimationParametersServerRpc(float speed, bool grounded, bool jump, bool freeFall)
         {
             // Server updates the networked values
@@ -149,38 +169,49 @@ namespace Netcode
 
         private void Update()
         {
-            if (IsOwner)
+            if (IsOwner && NetworkManager.Singleton.IsClient && NetworkManager.Singleton.IsConnectedClient)
             {
-                _playerInput.enabled = true;
-                _input.enabled = true;
-
+                // Only process input for the owner client that is fully connected
                 GroundedCheck();
                 HandleGravityAndJumping();
                 Move();
 
-                // Sync position and animation variables only if we're the owner
+                // Send position update to the server if we are the owner
                 if (IsServer)
                 {
                     Position.Value = transform.position;
                 }
+                else
+                {
+                    // Send client position update to the server via an RPC
+                    SubmitPositionRequestServerRpc(transform.position);
+                }
 
-                // Send updated animation parameters to the server via RPC
+                // Update animation parameters based on local input
                 UpdateAnimationParametersServerRpc(_animationBlend, Grounded, _animator.GetBool(_animIDJump), _animator.GetBool(_animIDFreeFall));
             }
             else
             {
-                // For non-owners, disable input and just follow the server-synced position
-                _playerInput.enabled = false;
-                _input.enabled = false;
+                // Non-owners or unconnected clients follow the position from the network variable
                 transform.position = Position.Value;
             }
 
             UpdateAnimator();
         }
 
+        // RPC to submit position updates from client to server
+        [ServerRpc]
+        private void SubmitPositionRequestServerRpc(Vector3 position)
+        {
+            if (IsServer)
+            {
+                Position.Value = position;
+            }
+        }
+
         private void GroundedCheck()
         {
-            Vector3 spherePosition = new Vector3(Position.Value.x, Position.Value.y - GroundedOffset, Position.Value.z);
+            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
             Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 
             if (_hasAnimator)
@@ -227,6 +258,7 @@ namespace Netcode
             }
             else
             {
+                Debug.Log("_spawnGrounded " + _spawnedGrounded);
                 _spawnedGrounded = true;
             }
         }
