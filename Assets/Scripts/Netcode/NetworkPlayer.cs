@@ -260,6 +260,7 @@ namespace Netcode
             if (Vector3.Distance(transform.position, clientPosition) > correctionThreshold)
             {
                 Debug.Log($"Server correcting position from {clientPosition} to {transform.position}");
+                
                 // Update the client to match the server's position
                 UpdatePositionClientRpc(transform.position, clientRotation);
             }
@@ -268,6 +269,19 @@ namespace Netcode
                 // Accept client position as valid
                 transform.position = clientPosition;
                 transform.rotation = clientRotation;
+            }
+            // Now, update non-owner clients with the position of the player
+            BroadcastMovementClientRpc(clientPosition, clientRotation); // Send to other clients
+        }
+
+        [ClientRpc]
+        private void BroadcastMovementClientRpc(Vector3 serverPosition, Quaternion serverRotation)
+        {
+            // Only non-owner clients should update their position and rotation based on the server's position
+            if (!IsOwner)
+            {
+                transform.position = serverPosition;
+                transform.rotation = serverRotation;
             }
         }
 
@@ -296,7 +310,6 @@ namespace Netcode
             transform.position = targetPosition;
             transform.rotation = targetRotation;
         }
-
 
         private void HandleGravityAndJumping()
         {
