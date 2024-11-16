@@ -11,6 +11,8 @@ public class SpawnTree : NetworkBehaviour
     public float maxRaycastDistance = 100f;
 
     private NetworkList<Vector3> spawnPoints; // Networked list for tree positions
+    public float minScale = 0.8f;
+    public float maxScale = 1.2f;
 
     private void Awake()
     {
@@ -120,7 +122,7 @@ public class SpawnTree : NetworkBehaviour
             GameObject tree = Instantiate(treePrefab, spawnPoint, Quaternion.identity, transform);
 
             // Randomize scale
-            float randomScale = Random.Range(0.8f, 1.2f);
+            float randomScale = Random.Range(minScale, maxScale);
             tree.transform.localScale *= randomScale;
 
             // Randomize rotation
