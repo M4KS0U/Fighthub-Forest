@@ -29,6 +29,7 @@ namespace Netcode
         public bool Grounded = true;
         public float GroundedOffset = -0.14f;
         public float GroundedRadius = 0.28f;
+        public Vector2 MapSize = new Vector2(50f, 50f); // Define map size for spawning
         public LayerMask GroundLayers;
 
         private CharacterController _controller;
@@ -68,7 +69,6 @@ namespace Netcode
         private bool _spawnedGrounded;
 
         // Networked variables to sync animation
-        public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
         public NetworkVariable<float> NetworkedSpeed = new NetworkVariable<float>();
         public NetworkVariable<bool> NetworkedGrounded = new NetworkVariable<bool>();
         public NetworkVariable<bool> NetworkedJump = new NetworkVariable<bool>();
@@ -86,6 +86,13 @@ namespace Netcode
 
         public override void OnNetworkSpawn()
         {
+            if (IsServer)
+            {
+                // Spawn the player at a random position on the server
+                Vector3 spawnPosition = GetRandomPositionOnMap();
+                transform.position = spawnPosition;
+            }
+
             if (IsOwner)
             {
                 // Only enable input for the owner, after a short delay to ensure connection
@@ -94,23 +101,11 @@ namespace Netcode
             else
             {
                 // Disable input for non-owners
-                if (_playerInput && _input) {
+                if (_playerInput && _input)
+                {
                     _playerInput.enabled = false;
                     _input.enabled = false;
                 }
-            }
-
-            if (IsServer)
-            {
-                // Server initializes position and sets listeners for all players
-                Vector3 startPosition = GetRandomPositionOnMap();
-                transform.position = startPosition;
-                Position.Value = startPosition;
-            }
-            else
-            {
-                // Clients subscribe to position updates from the server
-                Position.OnValueChanged += OnPositionChanged;
             }
         }
 
@@ -120,14 +115,6 @@ namespace Netcode
             yield return new WaitForSeconds(0.5f); // Delay to ensure client connection
             _playerInput.enabled = true;
             _input.enabled = true;
-        }
-
-        private void OnPositionChanged(Vector3 oldPosition, Vector3 newPosition)
-        {
-            if (!IsOwner)
-            {
-                transform.position = newPosition;
-            }
         }
 
         private void Start()
@@ -167,46 +154,36 @@ namespace Netcode
             NetworkedFreeFall.Value = freeFall;
         }
 
+        private Vector3 GetRandomPositionOnMap()
+        {
+            // Generate a random position within the defined map bounds
+            float randomX = Random.Range(-MapSize.x / 2, MapSize.x / 2);
+            float randomZ = Random.Range(-MapSize.y / 2, MapSize.y / 2);
+            Vector3 randomPosition = new Vector3(randomX, 0f, randomZ);
+
+            // Ensure the random position is grounded
+            if (Physics.Raycast(new Vector3(randomX, 10f, randomZ), Vector3.down, out RaycastHit hit, Mathf.Infinity, GroundLayers))
+            {
+                randomPosition.y = hit.point.y;
+            }
+
+            return randomPosition;
+        }
+
         private void Update()
         {
             if (IsOwner && NetworkManager.Singleton.IsClient && NetworkManager.Singleton.IsConnectedClient)
             {
-                // Only process input for the owner client that is fully connected
+                // Only process input and update movement for the owner client
                 GroundedCheck();
                 HandleGravityAndJumping();
                 Move();
 
-                // Send position update to the server if we are the owner
-                if (IsServer)
-                {
-                    Position.Value = transform.position;
-                }
-                else
-                {
-                    // Send client position update to the server via an RPC
-                    SubmitPositionRequestServerRpc(transform.position);
-                }
-
                 // Update animation parameters based on local input
                 UpdateAnimationParametersServerRpc(_animationBlend, Grounded, _animator.GetBool(_animIDJump), _animator.GetBool(_animIDFreeFall));
             }
-            else
-            {
-                // Non-owners or unconnected clients follow the position from the network variable
-                transform.position = Position.Value;
-            }
 
             UpdateAnimator();
-        }
-
-        // RPC to submit position updates from client to server
-        [ServerRpc]
-        private void SubmitPositionRequestServerRpc(Vector3 position)
-        {
-            if (IsServer)
-            {
-                Position.Value = position;
-            }
         }
 
         private void GroundedCheck()
@@ -222,6 +199,8 @@ namespace Netcode
 
         private void Move()
         {
+            if (!IsOwner) return;
+
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
@@ -244,6 +223,7 @@ namespace Netcode
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+
             if (_input.move != Vector2.zero)
             {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
@@ -252,16 +232,71 @@ namespace Netcode
             }
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+
+            // Apply movement locally
             if (_spawnedGrounded)
             {
                 _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
             else
             {
-                Debug.Log("_spawnGrounded " + _spawnedGrounded);
                 _spawnedGrounded = true;
             }
+
+            // Send updated position to the server periodically
+            if (Time.frameCount % 1 == 0) // Send every 1 frames
+            {
+                SendMovementToServerRpc(transform.position, transform.rotation);
+            }
         }
+
+        // ServerRpc to sync client position
+        [ServerRpc]
+        private void SendMovementToServerRpc(Vector3 clientPosition, Quaternion clientRotation)
+        {
+            // Threshold to determine if correction is needed
+            float correctionThreshold = 0.5f;
+
+            if (Vector3.Distance(transform.position, clientPosition) > correctionThreshold)
+            {
+                Debug.Log($"Server correcting position from {clientPosition} to {transform.position}");
+                // Update the client to match the server's position
+                UpdatePositionClientRpc(transform.position, clientRotation);
+            }
+            else
+            {
+                // Accept client position as valid
+                transform.position = clientPosition;
+                transform.rotation = clientRotation;
+            }
+        }
+
+        [ClientRpc]
+        private void UpdatePositionClientRpc(Vector3 serverPosition, Quaternion serverRotation)
+        {
+            StartCoroutine(SmoothCorrection(serverPosition, serverRotation));
+        }
+
+        private IEnumerator SmoothCorrection(Vector3 targetPosition, Quaternion targetRotation)
+        {
+            float duration = 0.1f; // Duration of the smoothing time
+            float elapsedTime = 0f;
+            Vector3 initialPosition = transform.position;
+            Quaternion initialRotation = transform.rotation;
+
+            while (elapsedTime < duration)
+            {
+                transform.position = Vector3.Lerp(initialPosition, targetPosition, elapsedTime / duration);
+                transform.rotation = Quaternion.Slerp(initialRotation, targetRotation, elapsedTime / duration);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            // Ensure that the final position and rotation is exactly set
+            transform.position = targetPosition;
+            transform.rotation = targetRotation;
+        }
+
 
         private void HandleGravityAndJumping()
         {
@@ -345,23 +380,6 @@ namespace Netcode
             {
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
-        }
-
-        private Vector3 GetRandomPositionOnMap()
-        {
-            float x = Random.Range(-10f, 10f);
-            float z = Random.Range(-10f, 10f);
-            float startY = 50f;
-            Vector3 startPosition = new Vector3(x, startY, z);
-            Vector3 rayDirection = Vector3.down;
-
-            RaycastHit hit;
-            if (Physics.Raycast(startPosition, rayDirection, out hit, Mathf.Infinity))
-            {
-                return hit.point;
-            }
-
-            return new Vector3(x, 0f, z);
         }
     }
 }
