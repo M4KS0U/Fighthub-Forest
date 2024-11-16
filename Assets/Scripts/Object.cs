@@ -5,9 +5,10 @@ using TMPro;
 
 public class Object : MonoBehaviour
 {
-    public string infoText = "Object";
-    public bool playerInRange;
+    public string infoObejct = "Object";
+    private bool playerInRange;
 
+    private Vector3 originalScale;
     Color m_MouseOverColor = Color.blue;
     Color m_OriginalColor;
     MeshRenderer m_Renderer;
@@ -15,16 +16,16 @@ public class Object : MonoBehaviour
     void Start()
     {
         m_Renderer = GetComponent<MeshRenderer>();
-        m_OriginalColor = m_Renderer.material.color;
+        originalScale = transform.localScale;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && playerInRange && TooltipManager.Instance.onTarget)
+        if (Input.GetKeyDown(KeyCode.E) && playerInRange && TooltipManager.Instance.onTarget)
         {
             if (!InventorySystem.Instance.CheckIsFull())
             {
-                InventorySystem.Instance.AddToInventory(infoText);
+                InventorySystem.Instance.AddToInventory(infoObejct);
                 Destroy(gameObject);
             }
             else
@@ -36,18 +37,17 @@ public class Object : MonoBehaviour
 
     void OnMouseOver()
     {
-        if (InventorySystem.Instance.isOpen == false)
-            m_Renderer.material.color = m_MouseOverColor;
+        transform.localScale = originalScale * 1.1f;
     }
 
     void OnMouseExit()
     {
-        m_Renderer.material.color = m_OriginalColor;
+        transform.localScale = originalScale;
     }
 
     public string GetInfo()
     {
-        return infoText;
+        return infoObejct;
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -66,14 +66,3 @@ public class Object : MonoBehaviour
         }
     }
 }
-
-
-/* TODO
-
-Faire en sorte que le nom de l'objet soit au dessus de l'objet et ne suive pas la souris
-
-Récupération des objets lorsque l'on clique sur E
-    Faire la range de l'objet
-    Détecter lorsque le player est dans la range 
-    Faire disparaitre l'objet lorsque l'on clique sur la touche
- */

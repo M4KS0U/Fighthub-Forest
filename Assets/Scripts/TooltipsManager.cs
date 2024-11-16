@@ -1,4 +1,4 @@
-    using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -8,7 +8,7 @@ public class TooltipManager : MonoBehaviour
 
     public bool onTarget;
     public TMP_Text tooltipText;
-    public Vector3 offset = new Vector3(10, 10, 0);
+    public Vector3 offset = new Vector3(0, 0.5f, 0);
 
     private void Start()
     {
@@ -22,7 +22,6 @@ public class TooltipManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
         else
         {
             Instance = this;
@@ -34,31 +33,30 @@ public class TooltipManager : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        //if (InventorySystem.Instance.isOpen == false)
-        //{
-            if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit))
+        {
+            Object objectName = hit.collider.GetComponent<Object>();
+            if (objectName != null)
             {
-                Object objectName = hit.collider.GetComponent<Object>();
-                if (objectName != null)
-                {
-                    onTarget = true;
+                onTarget = true;
+                tooltipText.gameObject.SetActive(true);
+                tooltipText.text = objectName.GetInfo();
 
-                    tooltipText.gameObject.SetActive(true);
-                    tooltipText.text = objectName.GetInfo();
+                Vector3 objectWorldPosition = hit.collider.transform.position;
+                Vector3 tooltipWorldPosition = objectWorldPosition + offset;
+                Vector3 tooltipScreenPosition = Camera.main.WorldToScreenPoint(tooltipWorldPosition);
 
-                    Vector3 tooltipPosition = Input.mousePosition + offset; // Prendre la position de l'objet (collider.gameObject.position / collider.position)
-                    tooltipText.transform.position = tooltipPosition;
-                }
-                else
-                {
-                    onTarget = false;
-                    tooltipText.gameObject.SetActive(false);
-                }
+                tooltipText.transform.position = tooltipScreenPosition;
             }
             else
             {
+                onTarget = false;
                 tooltipText.gameObject.SetActive(false);
             }
-        //}
+        }
+        else
+        {
+            tooltipText.gameObject.SetActive(false);
+        }
     }
 }
