@@ -5,35 +5,32 @@ using TMPro;
 
 public class Object : MonoBehaviour
 {
-    public string infoObject = "Object";
+    public string objectInfo = "Object";
     private bool playerInRange;
 
-    private Vector3 originalScale;
-    private MeshRenderer meshRenderer;
+    public SwitchWeapons switchWeapons;
 
     void Start()
     {
-        meshRenderer = GetComponent<MeshRenderer>();
-        originalScale = transform.localScale;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E) && playerInRange)
         {
-            Debug.Log($"Le joueur a ramassé : {infoObject}");
-            RamasserObjet();
+            Debug.Log($"Player has picked up: {objectInfo}");
+            PickupObject();
         }
     }
 
     void OnMouseOver()
     {
-        transform.localScale = originalScale * 1.1f;
+        transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
     }
 
     void OnMouseExit()
     {
-        transform.localScale = originalScale;
+        transform.localScale = Vector3.one;
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -41,7 +38,7 @@ public class Object : MonoBehaviour
         if (collider.CompareTag("Player"))
         {
             playerInRange = true;
-            Debug.Log($"Le joueur peut ramasser : {infoObject}");
+            Debug.Log($"Player can pick up: {objectInfo}");
         }
     }
 
@@ -53,8 +50,17 @@ public class Object : MonoBehaviour
         }
     }
 
-    private void RamasserObjet()
+    private void PickupObject()
     {
+        if (objectInfo == "Sword")
+        {
+            switchWeapons.SwitchWeapon("Sword");
+        }
+        else if (objectInfo == "Pistol")
+        {
+            switchWeapons.SwitchWeapon("Pistol");
+        }
+
         Destroy(gameObject);
     }
 }
