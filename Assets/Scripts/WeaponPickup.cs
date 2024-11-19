@@ -21,7 +21,7 @@ public class NetworkWeapon : NetworkBehaviour
         if (isPickedUp.Value) return; // Prevent multiple pickups
         isPickedUp.Value = true; // Mark the weapon as picked up
 
-        // Notify the client to attach the weapon visually
+        // Notify all clients to attach the weapon visually to the appropriate player
         AttachWeaponClientRpc(playerId);
 
         // Optionally destroy the weapon on the ground (it’s now "held")

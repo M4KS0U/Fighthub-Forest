@@ -74,10 +74,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d00dec123be83b445adbe6c8f3f02f41, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8897259029093792962}
+      addedObject: {fileID: 8270909716628638789}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d00dec123be83b445adbe6c8f3f02f41, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8270909716628638789}
+      addedObject: {fileID: 8897259029093792962}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d00dec123be83b445adbe6c8f3f02f41, type: 3}
       insertIndex: -1
       addedObject: {fileID: 363890760261306292}
@@ -93,19 +93,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d00dec123be83b445adbe6c8f3f02f41, type: 3}
   m_PrefabInstance: {fileID: 8039292098778674800}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8897259029093792962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7156259665276537633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30b54b102cb83844d9df2dfb08080c76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 3538692559444755151, guid: 014bfc3f846b5a442a2b15ddc05d6249, type: 3}
 --- !u!114 &8270909716628638789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,6 +114,21 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &8897259029093792962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7156259665276537633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30b54b102cb83844d9df2dfb08080c76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 3538692559444755151, guid: 014bfc3f846b5a442a2b15ddc05d6249, type: 3}
+  NetworkedAttack:
+    m_InternalValue: 0
 --- !u!114 &363890760261306292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,7 +142,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectType: Sword
-  playerWeaponHolder: {fileID: 0}
 --- !u!65 &6803484875050140113
 BoxCollider:
   m_ObjectHideFlags: 0
