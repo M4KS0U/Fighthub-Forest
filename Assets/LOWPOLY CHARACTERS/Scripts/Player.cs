@@ -27,6 +27,11 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        Move();
+    }
+
+    public void Move()
+    {
         if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) {
             playerAnim.SetBool("walk", true);
             walking = true;
