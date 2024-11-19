@@ -71,6 +71,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d00dec123be83b445adbe6c8f3f02f41, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4894355123021519863}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d00dec123be83b445adbe6c8f3f02f41, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 238589949246072275}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d00dec123be83b445adbe6c8f3f02f41, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3062708264976203087}
   m_SourcePrefab: {fileID: 100100000, guid: d00dec123be83b445adbe6c8f3f02f41, type: 3}
 --- !u!1 &7015781217938457060 stripped
 GameObject:
@@ -89,4 +95,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30b54b102cb83844d9df2dfb08080c76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 3538692559444755151, guid: 014bfc3f846b5a442a2b15ddc05d6249, type: 3}
+--- !u!114 &238589949246072275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7015781217938457060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b65ca250ac5824caab34461218339d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectType: Weapon
+  playerWeaponHolder: {fileID: 0}
+--- !u!65 &-3062708264976203087
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7015781217938457060}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.29391748, y: 1.1839278, z: 0.0814873}
+  m_Center: {x: -0.000000058075692, y: 0.45851696, z: -0.000000032006845}

@@ -41,27 +41,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 22.042564
+      value: 1.4556389
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 22.042564
+      value: 1.4556389
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       propertyPath: m_LocalScale.z
-      value: 22.042564
+      value: 1.4556389
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -29.16
+      value: -12.571
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.65
+      value: 3.668
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -22.85
+      value: -6.6259
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -95,6 +95,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pistol_E 1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -108,6 +112,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9021032162034722890}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4516649465608904408}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -629746448624572889}
     - targetCorrespondingSourceObject: {fileID: -8279185632701537749, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5414598848180796028}
@@ -156,10 +166,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8eb88856961ca0b479445c240b5fb259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 0}
+  bulletPrefab: {fileID: 4590927785846671056, guid: fdb83453720f71b4e99ca29a6f12106a, type: 3}
   bulletSpawn: {fileID: 7812824516495913131}
   bulletSpeed: 30
   lifeTime: 3
+--- !u!114 &4516649465608904408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484462717333004712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b65ca250ac5824caab34461218339d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectInfo: Pistol
+  switchWeapons: {fileID: -6227235282354080905, guid: 014bfc3f846b5a442a2b15ddc05d6249, type: 3}
+--- !u!65 &-629746448624572889
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484462717333004712}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &532037319781154514 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8279185632701537749, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}

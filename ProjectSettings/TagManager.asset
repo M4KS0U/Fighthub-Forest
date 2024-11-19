@@ -6,6 +6,8 @@ TagManager:
   tags:
   - CinemachineTarget
   - Ground
+  - Sword
+  - Pistol
   layers:
   - Default
   - TransparentFX
