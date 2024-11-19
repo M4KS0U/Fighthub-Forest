@@ -93,11 +93,36 @@ public class Object : MonoBehaviour
         Debug.Log($"{objectType} picked up and equipped.");
     }
 
+    private static Transform FindInChildren(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name)
+            {
+                return child; // Si le GameObject est trouvé
+            }
+
+            // Recherche récursive dans les sous-enfants
+            Transform found = FindInChildren(child, name);
+            if (found != null)
+            {
+                return found; // Si le GameObject est trouvé dans les sous-enfants
+            }
+        }
+
+        return null; // Si rien n'est trouvé
+    }
+
+
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.CompareTag("Player"))
         {
             playerInRange = true;
+            GameObject player = collider.gameObject;
+            // get rig child
+            GameObject hand = FindInChildren(player.transform, "Hand_r").gameObject;
+            playerWeaponHolder = hand.transform;
         }
     }
 
