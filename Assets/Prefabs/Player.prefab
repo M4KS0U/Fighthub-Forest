@@ -1843,7 +1843,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2056861913
+  GlobalObjectIdHash: 1772434545
   InScenePlacedSourceGlobalObjectIdHash: 2056861913
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4499,8 +4499,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 96.704
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 238589949246072275, guid: 482e13992e8fe2f4093baf848fc16cdb, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
