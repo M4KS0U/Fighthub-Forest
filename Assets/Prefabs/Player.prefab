@@ -1756,6 +1756,7 @@ GameObject:
   - component: {fileID: -4011269157929970127}
   - component: {fileID: -1816661790863636268}
   - component: {fileID: -6227235282354080905}
+  - component: {fileID: 7387835719623959097}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -1842,7 +1843,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1772434545
+  GlobalObjectIdHash: 2056861913
   InScenePlacedSourceGlobalObjectIdHash: 2056861913
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2078,6 +2079,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sword: {fileID: 8705504004142390011}
   pistol: {fileID: 484462717333004712, guid: 918b9474023669246b151457d2897716, type: 3}
+--- !u!114 &7387835719623959097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3538692559444755151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d64fd77506a545548871e9ae9d556533, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
 --- !u!1 &3749222655638054416
 GameObject:
   m_ObjectHideFlags: 0
