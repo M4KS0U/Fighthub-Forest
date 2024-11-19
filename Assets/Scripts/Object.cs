@@ -76,7 +76,7 @@ public class Object : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E) && playerInRange)
+        if (Input.GetKeyDown(KeyCode.E) && playerInRange && playerWeaponHolder != null)
         {
             PickUpWeapon();
         }
@@ -84,13 +84,7 @@ public class Object : MonoBehaviour
 
     private void PickUpWeapon()
     {
-        transform.SetParent(playerWeaponHolder);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
-
-        gameObject.SetActive(true);
-
-        Debug.Log($"{objectType} picked up and equipped.");
+        playerWeaponHolder.gameObject.SetActive(true);
     }
 
     private static Transform FindInChildren(Transform parent, string name)
@@ -121,8 +115,7 @@ public class Object : MonoBehaviour
             playerInRange = true;
             GameObject player = collider.gameObject;
             // get rig child
-            GameObject hand = FindInChildren(player.transform, "Hand_r").gameObject;
-            playerWeaponHolder = hand.transform;
+            playerWeaponHolder = FindInChildren(player.transform, "Sword_01");
         }
     }
 

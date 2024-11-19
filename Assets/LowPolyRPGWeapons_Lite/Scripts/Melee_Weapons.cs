@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MeleeWeapon : MonoBehaviour
 {
-    private bool isEnemyInRange = false;
     private Collider enemyCollider;
     private Animator playerAnimator;
 
@@ -49,7 +48,6 @@ public class MeleeWeapon : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            isEnemyInRange = true;
             enemyCollider = other;
         }
     }
@@ -58,7 +56,6 @@ public class MeleeWeapon : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            isEnemyInRange = false;
             enemyCollider = null;
         }
     }
