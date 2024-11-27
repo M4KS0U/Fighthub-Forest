@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections.Generic;
 
 public class NetworkWeapon : NetworkBehaviour
 {
@@ -37,11 +38,21 @@ public class NetworkWeapon : NetworkBehaviour
     [ClientRpc]
     private void AttachWeaponClientRpc(ulong playerId, string weaponHolderName)
     {
+        Debug.Log(playerId + " " + NetworkManager.Singleton.LocalClientId);
         if (NetworkManager.Singleton.LocalClientId == playerId)
         {
             var playerTransform = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().transform;
 
             Transform weaponHolder = FindInChildren(playerTransform, weaponHolderName);
+
+            Debug.Log(weaponHolder);
+            if (weaponHolder != null)
+            {
+                weaponHolder.gameObject.SetActive(true);
+            }
+        } else {
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            Transform weaponHolder = FindInChildren(players[playerId].transform, "Sword_01");
 
             if (weaponHolder != null)
             {
