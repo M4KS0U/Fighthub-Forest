@@ -5,50 +5,47 @@ public class NetworkWeapon : NetworkBehaviour
 {
     public string objectType = "Weapon";
     private bool playerInRange;
-    private NetworkVariable<bool> isPickedUp = new NetworkVariable<bool>(false); // Sync weapon state
+    private NetworkVariable<bool> isPickedUp = new NetworkVariable<bool>(false);
 
     void Update()
     {
         if (IsOwner && Input.GetKeyDown(KeyCode.E) && playerInRange)
         {
-            RequestPickUpWeaponServerRpc(NetworkManager.Singleton.LocalClientId); // Notify server to pick up the weapon
+            RequestPickUpWeaponServerRpc(NetworkManager.Singleton.LocalClientId);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void RequestPickUpWeaponServerRpc(ulong playerId)
     {
-        if (isPickedUp.Value) return; // Prevent multiple pickups
-        isPickedUp.Value = true; // Mark the weapon as picked up
+        if (isPickedUp.Value) return;
+        isPickedUp.Value = true;
 
-        // Notify all clients to attach the weapon visually to the appropriate player
-        AttachWeaponClientRpc(playerId);
+        var player = NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject;
 
-        // Optionally destroy the weapon on the ground (it’s now "held")
+        Transform weaponHolder = FindInChildren(player.transform, "Sword_01");
+
+        if (weaponHolder != null)
+        {
+            // Send the target player ID and weapon holder information to all clients
+            AttachWeaponClientRpc(playerId, weaponHolder.gameObject.name);
+        }
+
         Destroy(gameObject);
     }
 
     [ClientRpc]
-    private void AttachWeaponClientRpc(ulong playerId)
+    private void AttachWeaponClientRpc(ulong playerId, string weaponHolderName)
     {
-        // Only activate the sword for the player who picked it up
         if (NetworkManager.Singleton.LocalClientId == playerId)
         {
-            // Find the player object associated with the playerId
-            var client = NetworkManager.Singleton.ConnectedClients[playerId];
+            var playerTransform = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().transform;
 
-            if (client != null)
+            Transform weaponHolder = FindInChildren(playerTransform, weaponHolderName);
+
+            if (weaponHolder != null)
             {
-                Transform playerTransform = client.PlayerObject.transform;
-
-                // Find the weapon holder (Sword_01) on the player
-                Transform weaponHolder = FindInChildren(playerTransform, "Sword_01");
-
-                if (weaponHolder != null)
-                {
-                    // Activate the weapon holder and attach the weapon to it
-                    weaponHolder.gameObject.SetActive(true); // This activates the Sword_01 holder
-                }
+                weaponHolder.gameObject.SetActive(true);
             }
         }
     }
@@ -74,7 +71,7 @@ public class NetworkWeapon : NetworkBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (!IsOwner || isPickedUp.Value) return; // Only proceed if this player owns the object and it's not picked up
+        if (!IsOwner || isPickedUp.Value) return;
 
         if (collider.CompareTag("Player"))
         {

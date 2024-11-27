@@ -6,18 +6,18 @@ using Unity.Netcode;
 public class WeaponSpawner : NetworkBehaviour
 {
     [Header("Weapons")]
-    public GameObject[] weapons; // List of weapon prefabs
+    public GameObject[] weapons;
     public GameObject networkWeaponPrefab;
 
     [Header("Spawn Settings")]
-    public string playerTag = "Player"; // Tag used to find the player
-    public int numberOfWeaponsToSpawn = 5; // Number of weapons to spawn
+    public string playerTag = "Player";
+    public int numberOfWeaponsToSpawn = 5;
 
     [Header("Map Settings")]
-    public Vector2 MapSize = new Vector2(50f, 50f); // Dimensions of the map
-    public LayerMask GroundLayers; // Layers considered as ground for spawning
+    public Vector2 MapSize = new Vector2(50f, 50f);
+    public LayerMask GroundLayers;
 
-    private Transform player; // Reference to the player's Transform
+    private Transform player;
 
     private List<NetworkObjectReference> spawnedWeapons = new List<NetworkObjectReference>();
 
@@ -28,7 +28,6 @@ public class WeaponSpawner : NetworkBehaviour
 
     IEnumerator FindPlayerAndInitialize()
     {
-        // Wait until the player is instantiated in the scene
         while (player == null)
         {
             GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
@@ -36,7 +35,7 @@ public class WeaponSpawner : NetworkBehaviour
             {
                 player = playerObject.transform;
             }
-            yield return null; // Wait for the next frame
+            yield return null;
         }
 
         if (IsHost)
@@ -52,17 +51,13 @@ public class WeaponSpawner : NetworkBehaviour
             Vector3 randomPosition = GetRandomPositionOnMap();
             int randomIndex = Random.Range(0, weapons.Length);
 
-            // Instantiate the weapon prefab
             GameObject weaponInstance = Instantiate(networkWeaponPrefab, randomPosition, Quaternion.identity);
 
-            // Spawn the network object
             NetworkObject networkObject = weaponInstance.GetComponent<NetworkObject>();
-            networkObject.Spawn(true); // Spawn it for all clients
+            networkObject.Spawn(true);
 
-            // Now set the weapon index
             weaponInstance.GetComponent<WeaponData>().weaponIndex.Value = randomIndex;
 
-            // Keep track of the spawned weapons
             spawnedWeapons.Add(networkObject);
         }
     }
@@ -70,12 +65,10 @@ public class WeaponSpawner : NetworkBehaviour
 
     private Vector3 GetRandomPositionOnMap()
     {
-        // Generate a random position within the defined map bounds
         float randomX = Random.Range(-MapSize.x / 2, MapSize.x / 2);
         float randomZ = Random.Range(-MapSize.y / 2, MapSize.y / 2);
         Vector3 randomPosition = new Vector3(randomX, 0f, randomZ);
 
-        // Ensure the random position is grounded
         if (Physics.Raycast(new Vector3(randomX, 10f, randomZ), Vector3.down, out RaycastHit hit, Mathf.Infinity, GroundLayers))
         {
             randomPosition.y = hit.point.y;
