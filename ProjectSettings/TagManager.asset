@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - CinemachineTarget
+  - Ground
+  - Sword
+  - Pistol
   layers:
   - Default
   - TransparentFX

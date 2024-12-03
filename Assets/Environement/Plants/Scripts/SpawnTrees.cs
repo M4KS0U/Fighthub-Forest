@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class SpawnTree : MonoBehaviour
+public class SpawnTree : NetworkBehaviour
 {
     public GameObject[] treePrefabs;
     public int maxTrees = 100;
@@ -9,18 +10,40 @@ public class SpawnTree : MonoBehaviour
     public float maxSlope = 30f; // Maximum inclination in degrees
     public float maxRaycastDistance = 100f;
 
+    private NetworkList<Vector3> spawnPoints; // Networked list for tree positions
     public float minScale = 0.8f;
     public float maxScale = 1.2f;
 
-    private List<Vector3> spawnPoints = new List<Vector3>();
-
-    void Start()
+    private void Awake()
     {
-        GenerateSpawnPoints();
-        PlaceTrees();
+        // Initialize the NetworkList only once (before the network is started)
+        spawnPoints = new NetworkList<Vector3>();
     }
 
-    void GenerateSpawnPoints()
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            // Generate spawn points on the server once the network is fully initialized
+            GenerateSpawnPoints();
+            PlaceTrees(); // Server places trees locally for visualization purposes
+        }
+
+        // Clients instantiate trees based on the server's spawnPoints
+        if (IsClient)
+        {
+            // Manually place trees if the list is already populated
+            if (spawnPoints.Count > 0)
+            {
+                PlaceTrees();
+            }
+
+            // Listen for changes in spawnPoints so clients can update trees in real time
+            spawnPoints.OnListChanged += (change) => PlaceTrees();
+        }
+    }
+
+    private void GenerateSpawnPoints()
     {
         int tries = 0;
         while (spawnPoints.Count < maxTrees && tries < maxTrees * 10)
@@ -40,18 +63,16 @@ public class SpawnTree : MonoBehaviour
 
                 if (IsPreferredLocation(hit, slopeAngle) && IsNotTooClose(hit.point))
                 {
-                    spawnPoints.Add(hit.point);
-                } else {
-                    Debug.DrawRay(randomPoint, Vector3.down * maxRaycastDistance, Color.red, 1f);
+                    spawnPoints.Add(hit.point); // Add to NetworkList for synchronization
                 }
             }
             tries++;
         }
     }
 
-    bool IsPreferredLocation(RaycastHit hit, float slopeAngle)
+    private bool IsPreferredLocation(RaycastHit hit, float slopeAngle)
     {
-        // Check height oh the hit point
+        // Check the height of the hit point
         if (hit.point.y < transform.position.y - 1.8) return false;
 
         // Check triangle color (using vertex colors)
@@ -67,17 +88,16 @@ public class SpawnTree : MonoBehaviour
 
             Color averageColor = (vertexColorA + vertexColorB + vertexColorC) / 3f;
             Vector3 averageColorVector = new Vector3(averageColor.r, averageColor.g, averageColor.b);
-
             averageColorVector.Normalize();
-            
-            // more its green, more it's a good spot
+
+            // The greener it is, the better the spot
             if (averageColorVector.y < 0.75) return false;
             return true;
         }
         return false;
     }
 
-    bool IsNotTooClose(Vector3 position)
+    private bool IsNotTooClose(Vector3 position)
     {
         foreach (Vector3 point in spawnPoints)
         {
@@ -87,12 +107,19 @@ public class SpawnTree : MonoBehaviour
         return true;
     }
 
-    void PlaceTrees()
+    private void PlaceTrees()
     {
+        // Clear existing trees (optional, if you want to avoid duplicates)
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Instantiate trees at all spawn points in the NetworkList
         foreach (Vector3 spawnPoint in spawnPoints)
         {
             var treePrefab = treePrefabs[Random.Range(0, treePrefabs.Length)];
-            GameObject tree = Instantiate(treePrefab, spawnPoint, Quaternion.identity);
+            GameObject tree = Instantiate(treePrefab, spawnPoint, Quaternion.identity, transform);
 
             // Randomize scale
             float randomScale = Random.Range(minScale, maxScale);
