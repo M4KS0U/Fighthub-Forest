@@ -114,13 +114,13 @@ PrefabInstance:
       addedObject: {fileID: 9021032162034722890}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 8645103098804844986}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 4516649465608904408}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       insertIndex: -1
       addedObject: {fileID: -629746448624572889}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8645103098804844986}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2733701949272812501}
@@ -176,41 +176,6 @@ MonoBehaviour:
   bulletSpawn: {fileID: 7812824516495913131}
   bulletSpeed: 30
   lifeTime: 3
---- !u!114 &4516649465608904408
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 484462717333004712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2b65ca250ac5824caab34461218339d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectType: Weapon
-  playerWeaponHolder: {fileID: 0}
---- !u!65 &-629746448624572889
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 484462717333004712}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8645103098804844986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,6 +197,40 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &4516649465608904408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484462717333004712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b65ca250ac5824caab34461218339d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectType: Weapon
+--- !u!65 &-629746448624572889
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484462717333004712}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2733701949272812501
 MonoBehaviour:
   m_ObjectHideFlags: 0
