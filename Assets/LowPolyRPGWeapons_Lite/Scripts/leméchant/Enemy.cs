@@ -1,29 +1,60 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public int health = 100;
+    public float health = 100;
+    private bool OutZone = false;
+    private DamageEffect damageEffect;
 
-    // public void TakeDamage(int damage)
-    // {
-    //     health -= damage;
-    //     Debug.Log("Ennemi touché ! Santé restante : " + health);
+    void Start()
+    {
+        // get the DamageEffect component in the scene
+        damageEffect = GameObject.FindObjectOfType<DamageEffect>();
+    }
 
-    //     if (health <= 0)
-    //     {
-    //         Die();
-    //     }
-    // }
-    public void TakeDamage(int damage)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "BorderLimit")
+        {
+            OutZone = false;
+        }
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "BorderLimit")
+        {
+            OutZone = true;
+        }
+    }
+
+    private void Update()
+    {
+        if (OutZone)
+        {
+            TakeDamage(Time.deltaTime * 10);
+        }
+    }
+    
+
+    public void TakeDamage(float damage)
     {
         health -= damage;
         Debug.Log("Ennemi touché ! Santé restante : " + health);
 
         // Effet de couleur lors de l'impact
-        GetComponent<Renderer>().material.color = Color.red;
-        Invoke("ResetColor", 0.1f);
+        Renderer render = GetComponent<Renderer>();
+        if (render)
+        {
+            render.material.color = Color.red;
+            Invoke("ResetColor", 0.1f);
+        }
+        //if (IsOwner)
+            damageEffect.DamageEffectOn();
 
         if (health <= 0)
         {
