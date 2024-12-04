@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode; // Include Netcode for GameObjects namespace
 using UnityEngine;
 
-public class MeleeWeapon : MonoBehaviour
+public class MeleeWeapon : NetworkBehaviour
 {
     private Collider enemyCollider;
     private Animator playerAnimator;
@@ -20,7 +21,7 @@ public class MeleeWeapon : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
+        if (IsOwner && Input.GetKeyDown(KeyCode.M)) // Only allow the local player to initiate attacks
         {
             Attack();
         }
@@ -35,18 +36,47 @@ public class MeleeWeapon : MonoBehaviour
 
         if (enemyCollider != null)
         {
-            Debug.Log(enemyCollider.name);
             Enemy enemy = enemyCollider.GetComponent<Enemy>();
 
             if (enemy != null)
             {
-                enemy.TakeDamage(25);
+                // Request the server to apply damage
+                ApplyDamageServerRpc(enemyCollider.gameObject.GetComponent<NetworkObject>().NetworkObjectId, 25);
             }
+        }
+
+        // Notify all clients to play the attack animation
+        PlayAttackAnimationClientRpc();
+    }
+
+    [ServerRpc]
+    private void ApplyDamageServerRpc(ulong enemyNetworkObjectId, int damage)
+    {
+        // Validate the enemy object exists on the server
+        NetworkObject enemyObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[enemyNetworkObjectId];
+        if (enemyObject != null)
+        {
+            Enemy enemy = enemyObject.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage);
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void PlayAttackAnimationClientRpc()
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger("Attack");
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!IsOwner) return; // Only the local player tracks their own triggers
+
         if (other.gameObject.GetComponent<Enemy>())
         {
             Debug.Log("Enemy in range");
@@ -56,6 +86,8 @@ public class MeleeWeapon : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if (!IsOwner) return; // Only the local player tracks their own triggers
+
         if (other.gameObject.GetComponent<Enemy>())
         {
             enemyCollider = null;
