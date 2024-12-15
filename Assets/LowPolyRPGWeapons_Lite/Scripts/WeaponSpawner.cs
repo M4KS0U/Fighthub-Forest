@@ -108,8 +108,8 @@ using Unity.Netcode;
 public class WeaponSpawner : NetworkBehaviour
 {
     [Header("Weapons")]
-    public GameObject[] weapons; // Liste des modèles d'armes
-    public GameObject[] networkWeaponPrefabs; // Liste des prefabs réseau
+    public GameObject[] weapons;
+    public GameObject[] networkWeaponPrefabs;
 
     [Header("Spawn Settings")]
     public string playerTag = "Player";
@@ -148,30 +148,24 @@ public class WeaponSpawner : NetworkBehaviour
 
     void SpawnWeaponsOnMap()
     {
-        // Réinitialise la liste des armes spawnées
         spawnedWeapons.Clear();
 
         for (int i = 0; i < numberOfWeaponsToSpawn; i++)
         {
             Vector3 randomPosition = GetRandomPositionOnMap();
 
-            // Sélectionner un prefab d'arme réseau aléatoire
             int randomNetworkPrefabIndex = Random.Range(0, networkWeaponPrefabs.Length);
             GameObject selectedNetworkPrefab = networkWeaponPrefabs[randomNetworkPrefabIndex];
 
-            // Sélectionner un type d'arme aléatoire
             int randomWeaponIndex = Random.Range(0, weapons.Length);
 
-            // Instancier le prefab réseau et assigner son index
             GameObject weaponInstance = Instantiate(selectedNetworkPrefab, randomPosition, Quaternion.identity);
 
             NetworkObject networkObject = weaponInstance.GetComponent<NetworkObject>();
-            networkObject.Spawn(true); // Spawn l'objet réseau
+            networkObject.Spawn(true);
 
-            // Assigner l'index d'arme au prefab réseau via WeaponData
             weaponInstance.GetComponent<WeaponData>().weaponIndex.Value = randomWeaponIndex;
 
-            // Ajouter l'arme spawnée à la liste
             spawnedWeapons.Add(networkObject);
         }
     }
@@ -200,7 +194,6 @@ public class WeaponSpawner : NetworkBehaviour
 
     private void SyncWeaponsOnClient()
     {
-        // Réinitialise les armes synchronisées
         foreach (var weaponRef in spawnedWeapons)
         {
             if (weaponRef.TryGet(out NetworkObject weaponObject))
