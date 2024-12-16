@@ -20,7 +20,7 @@ public class MeleeWeapon : NetworkBehaviour
 
     private void Update()
     {
-        if (IsOwner && Input.GetKeyDown(KeyCode.M)) // Only allow the local player to initiate attacks
+        if (IsOwner && Input.GetKeyDown(KeyCode.M))
         {
             Attack();
         }
@@ -65,7 +65,7 @@ public class MeleeWeapon : NetworkBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!IsOwner) return; // Only the local player tracks their own triggers
+        if (!IsOwner) return;
 
         if (other.gameObject.GetComponent<Enemy>())
         {
