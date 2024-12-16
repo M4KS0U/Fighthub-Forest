@@ -8,6 +8,8 @@ TagManager:
   - Ground
   - Sword
   - Pistol
+  - BorderLimit
+  - Enemy
   layers:
   - Default
   - TransparentFX
