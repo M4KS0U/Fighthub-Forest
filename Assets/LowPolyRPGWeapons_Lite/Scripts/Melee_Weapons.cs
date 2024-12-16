@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode; // Include Netcode for GameObjects namespace
+using Unity.Netcode;
 using UnityEngine;
 
 public class MeleeWeapon : NetworkBehaviour
@@ -21,7 +21,7 @@ public class MeleeWeapon : NetworkBehaviour
 
     private void Update()
     {
-        if (IsOwner && Input.GetKeyDown(KeyCode.M)) // Only allow the local player to initiate attacks
+        if (IsOwner && Input.GetKeyDown(KeyCode.M))
         {
             Attack();
         }
@@ -40,19 +40,16 @@ public class MeleeWeapon : NetworkBehaviour
 
             if (enemy != null)
             {
-                // Request the server to apply damage
                 ApplyDamageServerRpc(enemyCollider.gameObject.GetComponent<NetworkObject>().NetworkObjectId, 25);
             }
         }
 
-        // Notify all clients to play the attack animation
         PlayAttackAnimationClientRpc();
     }
 
     [ServerRpc]
     private void ApplyDamageServerRpc(ulong enemyNetworkObjectId, int damage)
     {
-        // Validate the enemy object exists on the server
         NetworkObject enemyObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[enemyNetworkObjectId];
         if (enemyObject != null)
         {
@@ -69,14 +66,13 @@ public class MeleeWeapon : NetworkBehaviour
     {
         if (playerAnimator != null)
         {
-            playerAnimator.SetTrigger("Attack");
+            // playerAnimator.SetTrigger("Attack");
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!IsOwner) return; // Only the local player tracks their own triggers
-
+        if (!IsOwner) return;
         if (other.gameObject.GetComponent<Enemy>())
         {
             Debug.Log("Enemy in range");
@@ -86,7 +82,7 @@ public class MeleeWeapon : NetworkBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!IsOwner) return; // Only the local player tracks their own triggers
+        if (!IsOwner) return;
 
         if (other.gameObject.GetComponent<Enemy>())
         {
