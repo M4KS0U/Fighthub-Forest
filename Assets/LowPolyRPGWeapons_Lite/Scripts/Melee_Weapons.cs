@@ -55,7 +55,7 @@ public class MeleeWeapon : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!IsOwner || transform.parent.name == "Hand_r") return;
+        if (!IsOwner || (transform.parent && transform.parent.name == "Hand_r")) return;
 
         if (other.gameObject.GetComponent<Enemy>())
         {
