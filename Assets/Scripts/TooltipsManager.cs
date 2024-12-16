@@ -8,7 +8,7 @@ public class TooltipManager : MonoBehaviour
 
     public bool onTarget;
     public TMP_Text tooltipText;
-    public Vector3 offset = new Vector3(0, 0.5f, 0);
+    private Vector3 offset = new Vector3(0, 0.5f, 0);
 
     private void Start()
     {
@@ -41,6 +41,8 @@ public class TooltipManager : MonoBehaviour
                 onTarget = true;
                 tooltipText.gameObject.SetActive(true);
                 tooltipText.text = objectName.GetInfo();
+
+                offset.y = hit.collider.transform.position.y + 2.5f;
 
                 Vector3 objectWorldPosition = hit.collider.transform.position;
                 Vector3 tooltipWorldPosition = objectWorldPosition + offset;

@@ -14,6 +14,8 @@ public class InventorySystem : MonoBehaviour
     private GameObject whatSlotToEquip;
     public bool isOpen;
 
+    private bool hasObject;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -29,6 +31,7 @@ public class InventorySystem : MonoBehaviour
     void Start()
     {
         isOpen = false;
+        hasObject = false;
 
         PopulateSlotList();
     }
@@ -48,7 +51,7 @@ public class InventorySystem : MonoBehaviour
         }
     }
 
-    private void PopulateSlotList()
+    private void PopulateSlotList() // osef
     {
         foreach (Transform child in inventoryScreenUI.transform)
         {
@@ -61,6 +64,15 @@ public class InventorySystem : MonoBehaviour
 
     public void AddToInventory(string itemName)
     {
+        if (hasObject)
+        {
+            Debug.Log("Le joueur possède déjà un objet");
+            return;
+        }
+        else
+        {
+            
+        }
         whatSlotToEquip = FindNextEmptySlot();
 
         itemToAdd = Instantiate(Resources.Load<GameObject>(itemName), whatSlotToEquip.transform.position,  whatSlotToEquip.transform.rotation);
@@ -98,3 +110,6 @@ public class InventorySystem : MonoBehaviour
 }
 
 // Faire en sorte de localiser uniquement l'object que je touche avec ma souris et pas tout ceux dans la zone
+
+// Faire un seul slot dans l'inventaire.
+// Faire en sorte que lorsque l'on prend un object il soit dans le slot puis dès on en prend un autre lacher celui qu'on a et remplacer dans l'inventaire le nouveau
