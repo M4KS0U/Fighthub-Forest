@@ -260,7 +260,7 @@ namespace Netcode
 
             if (Vector3.Distance(transform.position, clientPosition) > correctionThreshold)
             {
-                Debug.Log($"Server correcting position from {clientPosition} to {transform.position}");
+//                Debug.Log($"Server correcting position from {clientPosition} to {transform.position}");
                 
                 // Update the client to match the server's position
                 UpdatePositionClientRpc(transform.position, clientRotation);
