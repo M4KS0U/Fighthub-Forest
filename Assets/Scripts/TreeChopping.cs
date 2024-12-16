@@ -6,12 +6,39 @@ public class TreeChopping : MonoBehaviour
     public float fallForce = 5f;
     public int treeHealth = 100;
 
+    public float choppingRange = 5f;
+    private Transform playerTransform;
+
+    private void Start()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            playerTransform = player.transform;
+        }
+        else
+        {
+            Debug.LogError("Aucun joueur trouvé avec le tag 'Player' !");
+        }
+    }
+
+    // private void Update()
+    // {
+    //     if (playerTransform != null && Input.GetMouseButtonDown(0)) // Si clic gauche
+    //     {
+    //         CheckChoppingRange();
+    //     }
+    // }
+
+
+
     void OnMouseDown()
     {
-        if (TreeChopped != null)
+        if (playerTransform != null && CheckChoppingRange() && TreeChopped != null)
         {
+            // CheckChoppingRange();
             treeHealth -= 50;
-
+            // Reduire la taille de l'arbre
             if (treeHealth <= 0)
             {
                 Vector3 clickPosition = GetClickPosition();
@@ -35,7 +62,22 @@ public class TreeChopping : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Aucun objet n'est assign� pour l'instanciation !");
+            Debug.LogWarning("Aucun objet n'est assign� pour l'instanciation !");
+        }
+    }
+    private bool CheckChoppingRange()
+    {
+        // Vérifie la distance entre le joueur et l'arbre
+        float distance = Vector3.Distance(playerTransform.position, transform.position);
+
+        if (distance <= choppingRange)
+        {
+            return true;
+        }
+        else
+        {
+            Debug.Log("Le joueur est trop loin pour couper cet arbre.");
+            return false;
         }
     }
 
