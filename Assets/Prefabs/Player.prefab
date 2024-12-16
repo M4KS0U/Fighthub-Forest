@@ -1844,7 +1844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1772434545
+  GlobalObjectIdHash: 2056861913
   InScenePlacedSourceGlobalObjectIdHash: 2056861913
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2007,7 +2007,7 @@ MonoBehaviour:
   MapSize: {x: 50, y: 50}
   GroundLayers:
     serializedVersion: 2
-    m_Bits: 5
+    m_Bits: 1
   NetworkedSpeed:
     m_InternalValue: 0
   NetworkedGrounded:

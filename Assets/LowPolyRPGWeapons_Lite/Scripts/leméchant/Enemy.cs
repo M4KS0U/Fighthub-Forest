@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : NetworkBehaviour
 {
     public float health = 100;
     private bool OutZone = false;
@@ -53,7 +53,7 @@ public class Enemy : MonoBehaviour
             render.material.color = Color.red;
             Invoke("ResetColor", 0.1f);
         }
-        //if (IsOwner)
+        if (IsOwner)
             damageEffect.DamageEffectOn();
 
         if (health <= 0)

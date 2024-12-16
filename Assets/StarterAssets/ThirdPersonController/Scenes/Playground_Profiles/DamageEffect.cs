@@ -15,7 +15,6 @@ public class DamageEffect : MonoBehaviour
 
     public void DamageEffectOn()
     {
-        Debug.Log("DamageEffectOn");
         if (isDamageEffectOn)
         {
             StopAllCoroutines();
@@ -33,6 +32,5 @@ public class DamageEffect : MonoBehaviour
         yield return new WaitForSeconds(damageDuration);
         volume.profile = defaultProfile;
         isDamageEffectOn = false;
-        Debug.Log("DamageEffectOff");
     }
 }

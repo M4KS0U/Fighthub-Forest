@@ -164,6 +164,7 @@ namespace Netcode
             // Ensure the random position is grounded
             if (Physics.Raycast(new Vector3(randomX, 10f, randomZ), Vector3.down, out RaycastHit hit, Mathf.Infinity, GroundLayers))
             {
+                Debug.Log($"THe player is spawning on the {hit.collider.gameObject.name}");
                 randomPosition.y = hit.point.y;
             }
 
