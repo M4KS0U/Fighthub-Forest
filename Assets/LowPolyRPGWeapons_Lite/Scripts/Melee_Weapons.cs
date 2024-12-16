@@ -1,7 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Netcode; // Include Netcode for GameObjects namespace
+using Unity.Netcode;
 using UnityEngine;
 
 public class MeleeWeapon : NetworkBehaviour
@@ -10,6 +7,8 @@ public class MeleeWeapon : NetworkBehaviour
     private Animator playerAnimator;
 
     [SerializeField] private GameObject player;
+
+    private bool isAttacking = false; // Flag to track if the player is attacking
 
     private void Start()
     {
@@ -34,34 +33,13 @@ public class MeleeWeapon : NetworkBehaviour
             playerAnimator.SetTrigger("Attack");
         }
 
-        if (enemyCollider != null)
-        {
-            Enemy enemy = enemyCollider.GetComponent<Enemy>();
-
-            if (enemy != null)
-            {
-                // Request the server to apply damage
-                ApplyDamageServerRpc(enemyCollider.gameObject.GetComponent<NetworkObject>().NetworkObjectId, 25);
-            }
-        }
-
         // Notify all clients to play the attack animation
         PlayAttackAnimationClientRpc();
     }
 
-    [ServerRpc]
-    private void ApplyDamageServerRpc(ulong enemyNetworkObjectId, int damage)
+    private void ResetAttack()
     {
-        // Validate the enemy object exists on the server
-        NetworkObject enemyObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[enemyNetworkObjectId];
-        if (enemyObject != null)
-        {
-            Enemy enemy = enemyObject.GetComponent<Enemy>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(damage);
-            }
-        }
+        isAttacking = false;
     }
 
     [ClientRpc]
@@ -69,7 +47,9 @@ public class MeleeWeapon : NetworkBehaviour
     {
         if (playerAnimator != null)
         {
+            isAttacking = true;
             playerAnimator.SetTrigger("Attack");
+            Invoke(nameof(ResetAttack), 1.0f); // Adjust duration to match your animation
         }
     }
 
@@ -81,17 +61,6 @@ public class MeleeWeapon : NetworkBehaviour
         {
             enemyCollider = other;
         }
-
-        Debug.Log("Collision received");
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("Player collision");
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("Player collision 2");
     }
 
     private void OnTriggerExit(Collider other)
@@ -102,5 +71,10 @@ public class MeleeWeapon : NetworkBehaviour
         {
             enemyCollider = null;
         }
+    }
+
+    public bool IsAttacking()
+    {
+        return isAttacking;
     }
 }

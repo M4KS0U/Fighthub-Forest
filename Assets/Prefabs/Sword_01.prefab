@@ -127,8 +127,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 3538692559444755151, guid: 014bfc3f846b5a442a2b15ddc05d6249, type: 3}
-  NetworkedAttack:
-    m_InternalValue: 0
 --- !u!114 &363890760261306292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,7 +150,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0

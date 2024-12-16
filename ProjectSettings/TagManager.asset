@@ -8,6 +8,7 @@ TagManager:
   - Ground
   - Sword
   - Pistol
+  - Enemy
   layers:
   - Default
   - TransparentFX

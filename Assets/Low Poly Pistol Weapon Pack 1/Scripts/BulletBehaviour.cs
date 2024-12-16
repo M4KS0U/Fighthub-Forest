@@ -34,7 +34,7 @@ public class BulletBehaviour : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // Affiche dans la console l'objet touché
-        print("Touche par balle : " + other.name);
+        // print("Touche par balle : " + other.name);
 
         // Si l'objet touché a le tag "Enemy", inflige des dégâts
         if (other.CompareTag("Enemy"))
