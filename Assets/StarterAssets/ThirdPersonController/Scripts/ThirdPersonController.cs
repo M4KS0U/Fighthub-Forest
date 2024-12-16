@@ -1,4 +1,5 @@
-﻿ using UnityEngine;
+using UnityEngine;
+using Unity.Netcode;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
@@ -12,7 +13,7 @@ namespace StarterAssets
 #if ENABLE_INPUT_SYSTEM 
     [RequireComponent(typeof(PlayerInput))]
 #endif
-    public class ThirdPersonController : MonoBehaviour
+    public class ThirdPersonController : NetworkBehaviour
     {
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
@@ -122,6 +123,9 @@ namespace StarterAssets
             }
         }
 
+        public NetworkVariable<Vector3> NetworkPosition = new NetworkVariable<Vector3>();
+        public NetworkVariable<Quaternion> NetworkRotation = new NetworkVariable<Quaternion>();
+
 
         private void Awake()
         {
@@ -135,7 +139,7 @@ namespace StarterAssets
         private void Start()
         {
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
-            
+
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
@@ -154,11 +158,20 @@ namespace StarterAssets
 
         private void Update()
         {
-            _hasAnimator = TryGetComponent(out _animator);
+            if (IsOwner)
+            {
+                _hasAnimator = TryGetComponent(out _animator);
 
-            JumpAndGravity();
-            GroundedCheck();
-            Move();
+                JumpAndGravity();
+                GroundedCheck();
+                Move();
+            }
+            else
+            {
+                // Update the position and rotation of non-owned players from the network
+                transform.position = Vector3.Lerp(transform.position, NetworkPosition.Value, Time.deltaTime * 10f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, NetworkRotation.Value, Time.deltaTime * 10f);
+            }
         }
 
         private void LateUpdate()
@@ -184,7 +197,8 @@ namespace StarterAssets
                 QueryTriggerInteraction.Ignore);
 
             // update animator if using character
-            if (_hasAnimator) {
+            if (_hasAnimator)
+            {
                 _animator.SetBool(_animIDGrounded, Grounded);
             }
         }
@@ -238,7 +252,9 @@ namespace StarterAssets
 
                 // round speed to 3 decimal places
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
-            } else {
+            }
+            else
+            {
                 _speed = targetSpeed;
             }
 
@@ -252,8 +268,7 @@ namespace StarterAssets
             // if there is a move input rotate player when the player is moving
             if (_input.move != Vector2.zero)
             {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                  _mainCamera.transform.eulerAngles.y;
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
 
@@ -278,42 +293,51 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
-            if (Grounded) {
+            if (Grounded)
+            {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
 
                 // update animator if using character
-                if (_hasAnimator) {
+                if (_hasAnimator)
+                {
                     _animator.SetBool(_animIDJump, false);
                     _animator.SetBool(_animIDFreeFall, false);
                 }
 
                 // stop our velocity dropping infinitely when grounded
-                if (_verticalVelocity < 0.0f) {
+                if (_verticalVelocity < 0.0f)
+                {
                     _verticalVelocity = -2f;
                 }
 
                 // Jump
-                if (_input.jump && _jumpTimeoutDelta <= 0.0f) {
+                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
                     // update animator if using character
-                    if (_hasAnimator) {
+                    if (_hasAnimator)
+                    {
                         _animator.SetBool(_animIDJump, true);
                     }
                 }
 
                 // jump timeout
-                if (_jumpTimeoutDelta >= 0.0f) {
+                if (_jumpTimeoutDelta >= 0.0f)
+                {
                     _jumpTimeoutDelta -= Time.deltaTime;
                 }
-            } else {
+            }
+            else
+            {
                 // reset the jump timeout timer
                 _jumpTimeoutDelta = JumpTimeout;
 
                 // fall timeout
-                if (_fallTimeoutDelta >= 0.0f) {
+                if (_fallTimeoutDelta >= 0.0f)
+                {
                     _fallTimeoutDelta -= Time.deltaTime;
                 }
                 else

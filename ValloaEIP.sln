@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{53682CDD-E8A4-BDA7-531D-4A1F07EDFA9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParrelSync", "ParrelSync.csproj", "{8178C57C-C6F3-A8D3-98FA-60B97C6C1339}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{1C085623-91D3-9F10-666E-C544B9A45B3C}"
 EndProject
 Global
@@ -15,6 +17,10 @@ Global
 		{53682CDD-E8A4-BDA7-531D-4A1F07EDFA9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53682CDD-E8A4-BDA7-531D-4A1F07EDFA9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53682CDD-E8A4-BDA7-531D-4A1F07EDFA9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8178C57C-C6F3-A8D3-98FA-60B97C6C1339}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8178C57C-C6F3-A8D3-98FA-60B97C6C1339}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8178C57C-C6F3-A8D3-98FA-60B97C6C1339}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8178C57C-C6F3-A8D3-98FA-60B97C6C1339}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1C085623-91D3-9F10-666E-C544B9A45B3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1C085623-91D3-9F10-666E-C544B9A45B3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C085623-91D3-9F10-666E-C544B9A45B3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
