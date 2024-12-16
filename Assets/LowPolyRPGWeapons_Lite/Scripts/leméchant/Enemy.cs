@@ -16,7 +16,7 @@ public class Enemy : MonoBehaviour
         damageEffect = GameObject.FindObjectOfType<DamageEffect>();
     }
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "BorderLimit")
         {

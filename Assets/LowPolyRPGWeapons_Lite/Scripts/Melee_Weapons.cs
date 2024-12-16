@@ -75,13 +75,23 @@ public class MeleeWeapon : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!IsOwner) return; // Only the local player tracks their own triggers
+        if (!IsOwner || transform.parent.name == "Hand_r") return;
 
         if (other.gameObject.GetComponent<Enemy>())
         {
-            Debug.Log("Enemy in range");
             enemyCollider = other;
         }
+
+        Debug.Log("Collision received");
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("Player collision");
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("Player collision 2");
     }
 
     private void OnTriggerExit(Collider other)
