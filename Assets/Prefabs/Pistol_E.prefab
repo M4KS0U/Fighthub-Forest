@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4793293047518782204
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8346200138347195652}
+  m_Layer: 0
+  m_Name: BulletSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8346200138347195652
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4793293047518782204}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.087, z: 0.265}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3330709823040497491}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &3004947216537665720
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -54,7 +85,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8346200138347195652}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
       insertIndex: -1
@@ -110,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2711903546
+  GlobalObjectIdHash: 2538331884
   InScenePlacedSourceGlobalObjectIdHash: 2538331884
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -131,8 +165,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8eb88856961ca0b479445c240b5fb259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 0}
-  bulletSpawn: {fileID: 0}
+  bulletPrefab: {fileID: 4590927785846671056, guid: fdb83453720f71b4e99ca29a6f12106a, type: 3}
+  bulletSpawn: {fileID: 8346200138347195652}
   bulletSpeed: 30
   lifeTime: 3
 --- !u!114 &1421978534897901085
@@ -147,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2b65ca250ac5824caab34461218339d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectType: Weapon
+  objectType: Pistol
 --- !u!114 &6511941853646010646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,3 +196,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponIndex:
     m_InternalValue: 0
+--- !u!4 &3330709823040497491 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e298dff659cdc204b8787bdf7c7ad63b, type: 3}
+  m_PrefabInstance: {fileID: 3004947216537665720}
+  m_PrefabAsset: {fileID: 0}

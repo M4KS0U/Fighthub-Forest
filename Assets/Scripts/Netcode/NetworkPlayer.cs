@@ -164,6 +164,7 @@ namespace Netcode
             // Ensure the random position is grounded
             if (Physics.Raycast(new Vector3(randomX, 10f, randomZ), Vector3.down, out RaycastHit hit, Mathf.Infinity, GroundLayers))
             {
+                Debug.Log($"THe player is spawning on the {hit.collider.gameObject.name}");
                 randomPosition.y = hit.point.y;
             }
 
@@ -259,7 +260,7 @@ namespace Netcode
 
             if (Vector3.Distance(transform.position, clientPosition) > correctionThreshold)
             {
-                Debug.Log($"Server correcting position from {clientPosition} to {transform.position}");
+//                Debug.Log($"Server correcting position from {clientPosition} to {transform.position}");
                 
                 // Update the client to match the server's position
                 UpdatePositionClientRpc(transform.position, clientRotation);
