@@ -116,7 +116,7 @@ public class WeaponSpawner : NetworkBehaviour
     public int numberOfWeaponsToSpawn = 5;
 
     [Header("Map Settings")]
-    public Vector2 MapSize = new Vector2(50f, 50f);
+    public Vector2 MapSize = new Vector2(100f, 100f);
     public LayerMask GroundLayers;
 
     private Transform player;
