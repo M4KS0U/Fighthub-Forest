@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using Netcode;
 
 public class NetworkWeapon : NetworkBehaviour
 {
@@ -8,9 +9,11 @@ public class NetworkWeapon : NetworkBehaviour
     private bool playerInRange;
     private NetworkVariable<bool> isPickedUp = new NetworkVariable<bool>(false);
 
+    private Netcode.NetworkPlayer player;
+
     void Update()
     {
-        if (IsOwner && Input.GetKeyDown(KeyCode.E) && playerInRange)
+        if (Input.GetKeyDown(KeyCode.E) && playerInRange && player.IsLocalPlayer)
         {
             RequestPickUpWeaponServerRpc(NetworkManager.Singleton.LocalClientId);
         }
@@ -101,10 +104,11 @@ public class NetworkWeapon : NetworkBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (!IsOwner || isPickedUp.Value) return;
+        if (isPickedUp.Value) return;
 
         if (collider.CompareTag("Player"))
         {
+            player = collider.GetComponent<Netcode.NetworkPlayer>();
             playerInRange = true;
         }
     }

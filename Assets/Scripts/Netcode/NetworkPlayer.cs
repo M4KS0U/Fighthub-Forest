@@ -115,11 +115,6 @@ namespace Netcode
             yield return new WaitForSeconds(0.5f); // Delay to ensure client connection
             _playerInput.enabled = true;
             _input.enabled = true;
-
-            // force to use the keyboard and mouse input
-            _playerInput.SwitchCurrentControlScheme("KeyboardMouse");
-            
-            
         }
 
         private void Start()
