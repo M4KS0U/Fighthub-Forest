@@ -13,6 +13,8 @@ public class AIControllerDeer : MonoBehaviour
 
     private Vector3? targetPatrol = null;
 
+    private float cd = 0.0f;
+
 
     void Start()
     {
@@ -30,10 +32,20 @@ public class AIControllerDeer : MonoBehaviour
             trueNode = new Decision
             {
                 decisionCondition = haveAally,
-                trueNode = new ActionNode(Attack),
+                trueNode = new Decision
+                {
+                    decisionCondition = IsMeleeInRange,
+                    trueNode = new ActionNode(Attack),
+                    falseNode = new ActionNode(GoTo)
+                },
                 falseNode = new ActionNode(makeAlly)
             },
-            falseNode = new ActionNode(followAllyOrPatrol)
+            falseNode = new Decision
+            {
+                decisionCondition = IsMeleeAlly,
+                trueNode = new ActionNode(Patrol),
+                falseNode = new ActionNode(followAllyOrPatrol)
+            }
         };
     }
 
@@ -88,6 +100,29 @@ public class AIControllerDeer : MonoBehaviour
         agent.isStopped = true;
         animator.SetBool("isWalking", false);
         animator.SetBool("isAttacking", true);
+        // get current frame
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if (!stateInfo.IsName("Attack"))
+            return;
+
+        float normalizedTime = stateInfo.normalizedTime;
+        normalizedTime -= (int)normalizedTime;
+        cd -= Time.deltaTime;
+        if ((int)(normalizedTime * 10) != 5 || cd >= 0.0f) {
+            return;
+        }
+        cd = 0.5f;
+
+        
+        Transform closestEnemy = FindClosestEnemy();
+        if (closestEnemy == null)
+            return;
+        GameObject enemy = closestEnemy.gameObject;
+        Enemy enemyScript = enemy.GetComponent<Enemy>();
+        if (enemyScript != null)
+        {
+            enemyScript.TakeDamage(20f);
+        }
     }
 
     private bool IsMeleeInRange()
@@ -97,7 +132,20 @@ public class AIControllerDeer : MonoBehaviour
         {
             return false;
         }
-        return Vector3.Distance(transform.position, closestEnemy.position) < 1f;
+        return Vector3.Distance(transform.position, closestEnemy.position) < 2f;
+    }
+    private bool IsMeleeAlly()
+    {
+        if (allyPlayer == null)
+        {
+            return false;
+        }
+        Transform closestEnemy = allyPlayer.transform;
+        if (closestEnemy == null)
+        {
+            return false;
+        }
+        return Vector3.Distance(transform.position, closestEnemy.position) < 3f;
     }
 
     bool IsHealthLow()
