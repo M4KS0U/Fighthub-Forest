@@ -62,17 +62,22 @@ namespace Netcode
         private int _animIDFreeFall;
         private int _animIDMotionSpeed;
 
+        private int _animIDDodge;
+
         private float _speed;
         private float _rotationVelocity;
         private float _animationBlend;
         private float _targetRotation = 0.0f;
         private bool _spawnedGrounded;
 
+        private float _timeDogde = 1.0f;
+
         // Networked variables to sync animation
         public NetworkVariable<float> NetworkedSpeed = new NetworkVariable<float>();
         public NetworkVariable<bool> NetworkedGrounded = new NetworkVariable<bool>();
         public NetworkVariable<bool> NetworkedJump = new NetworkVariable<bool>();
         public NetworkVariable<bool> NetworkedFreeFall = new NetworkVariable<bool>();
+        public NetworkVariable<bool> NetworkedDodge = new NetworkVariable<bool>();
 
         private bool _hasAnimator;
 
@@ -142,6 +147,7 @@ namespace Netcode
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+            _animIDDodge = Animator.StringToHash("Dodge");
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -152,6 +158,13 @@ namespace Netcode
             NetworkedGrounded.Value = grounded;
             NetworkedJump.Value = jump;
             NetworkedFreeFall.Value = freeFall;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void UpdateDodgeServerRpc(bool dodge)
+        {
+            // Server updates the networked values
+            NetworkedDodge.Value = dodge;
         }
 
         private Vector3 GetRandomPositionOnMap()
@@ -257,6 +270,22 @@ namespace Netcode
             }
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+            // left click to dodge
+            if (Input.GetMouseButtonDown(1) && !stateInfo.IsName("Dodge")) {
+                UpdateDodgeServerRpc(true);
+                _timeDogde = 0.0f;
+            }
+
+
+            // Comparer le nom de l'état
+            if (_timeDogde < 0.6f) {
+                if (_timeDogde > 0.05f) {
+                    UpdateDodgeServerRpc(false);
+                    _speed = 10f;
+                }
+                _timeDogde += Time.deltaTime;
+            }
 
             // Apply movement locally
             if (_spawnedGrounded)
@@ -389,6 +418,7 @@ namespace Netcode
                 {
                     _animator.SetFloat(_animIDSpeed, _animationBlend);
                     _animator.SetFloat(_animIDMotionSpeed, _input.analogMovement ? MoveInput().magnitude : 1f);
+                    _animator.SetBool(_animIDDodge, NetworkedDodge.Value);
                 }
                 else
                 {
@@ -397,6 +427,7 @@ namespace Netcode
                     _animator.SetBool(_animIDGrounded, NetworkedGrounded.Value);
                     _animator.SetBool(_animIDJump, NetworkedJump.Value);
                     _animator.SetBool(_animIDFreeFall, NetworkedFreeFall.Value);
+                    _animator.SetBool(_animIDDodge, NetworkedDodge.Value);
                 }
             }
         }

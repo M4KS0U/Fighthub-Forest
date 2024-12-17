@@ -20,7 +20,8 @@ public class MeleeWeapon : NetworkBehaviour
 
     private void Update()
     {
-        if (IsOwner && Input.GetKeyDown(KeyCode.M))
+        // right click to attack
+        if (IsOwner && Input.GetMouseButtonDown(0) && !isAttacking)
         {
             Attack();
         }

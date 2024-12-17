@@ -2017,6 +2017,8 @@ MonoBehaviour:
     m_InternalValue: 0
   NetworkedFreeFall:
     m_InternalValue: 0
+  NetworkedDodge:
+    m_InternalValue: 0
 --- !u!114 &-4011269157929970127
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4660,7 +4662,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 4590927785846671056, guid: fdb83453720f71b4e99ca29a6f12106a, type: 3}
   bulletSpawn: {fileID: 6249085696156933698}
-  playerAnimator: {fileID: 3528469446400477999}
   bulletSpeed: 30
   lifeTime: 3
 --- !u!4 &816154790891557909 stripped
