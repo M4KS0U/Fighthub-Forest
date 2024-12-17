@@ -17,10 +17,13 @@ public class Enemy : NetworkBehaviour
 
     private NetworkVariable<bool> isAliveServ = new NetworkVariable<bool>(true);
 
+    private Animator animator;
+
     void Start()
     {
         // get the DamageEffect component in the scene
         damageEffect = GameObject.FindObjectOfType<DamageEffect>();
+        animator = GetComponent<Animator>();
     }
 
     void OnTriggerEnter(Collider other)
@@ -70,7 +73,7 @@ public class Enemy : NetworkBehaviour
         }
         if (IsOwner)
             damageEffect.DamageEffectOn();
-
+        animator.SetTrigger("Hit");
         if (health <= 0)
         {
             Die();
