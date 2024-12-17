@@ -20,10 +20,10 @@ public class MeleeWeapon : NetworkBehaviour
 
     private void Update()
     {
-        // right click to attack
+        // left click to attack
         if (IsOwner && Input.GetMouseButtonDown(0) && !isAttacking)
         {
-            Attack();
+            AttackServerRpc();
         }
     }
 
@@ -38,6 +38,13 @@ public class MeleeWeapon : NetworkBehaviour
         PlayAttackAnimationClientRpc();
     }
 
+    [ServerRpc]
+    private void AttackServerRpc()
+    {
+        // Server triggers the ClientRpc for all clients
+        PlayAttackAnimationClientRpc();
+    }
+
     private void ResetAttack()
     {
         isAttacking = false;
@@ -46,11 +53,12 @@ public class MeleeWeapon : NetworkBehaviour
     [ClientRpc]
     private void PlayAttackAnimationClientRpc()
     {
+        Debug.Log("playerAnimator " + playerAnimator);
         if (playerAnimator != null)
         {
             isAttacking = true;
             playerAnimator.SetTrigger("Attack");
-            Invoke(nameof(ResetAttack), 1.0f); // Adjust duration to match your animation
+            Invoke(nameof(ResetAttack), 0.5f); // Adjust duration to match your animation
         }
     }
 
