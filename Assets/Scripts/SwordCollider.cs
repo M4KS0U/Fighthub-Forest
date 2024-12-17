@@ -27,7 +27,7 @@ public class SwordCollision : MonoBehaviour
             return;
         }
         // Ensure the collision is with a Player and not the parent holding the Sword
-        if (other.CompareTag("Player") && other.transform.root != transform.root)
+        if (other.transform.root != transform.root)
         {
             if (meleeWeapon != null && meleeWeapon.IsAttacking())
             {

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4819606783095600}
   - component: {fileID: 95511349741874662}
   - component: {fileID: 82645965520743322}
+  - component: {fileID: 5037477859654063953}
   m_Layer: 0
   m_Name: Deer
   m_TagString: Untagged
@@ -152,6 +153,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &5037477859654063953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567582185033856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d2e8032733f2c4e87e358ee92c94db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 95511349741874662}
 --- !u!1 &8447245532991050240
 GameObject:
   m_ObjectHideFlags: 0

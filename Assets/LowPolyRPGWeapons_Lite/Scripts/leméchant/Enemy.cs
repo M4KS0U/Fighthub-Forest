@@ -19,11 +19,14 @@ public class Enemy : NetworkBehaviour
 
     private Animator animator;
 
+    private MaterialPropertyBlock mpb;
+
     void Start()
     {
         // get the DamageEffect component in the scene
         damageEffect = GameObject.FindObjectOfType<DamageEffect>();
         animator = GetComponent<Animator>();
+        mpb = new MaterialPropertyBlock();
     }
 
     void OnTriggerEnter(Collider other)
@@ -57,23 +60,44 @@ public class Enemy : NetworkBehaviour
             TakeDamage(Time.deltaTime * 15);
         }
     }
+
+    private void ColorDamage()
+    {
+        // Appliquer la couleur principale (_BaseColor)
+        mpb.SetColor("_BaseColor", Color.red);
+
+        mpb.SetTexture("_BaseMap", Texture2D.whiteTexture);
+
+        // Récupérer le SkinnedMeshRenderer principal
+        SkinnedMeshRenderer skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
+        if (skinnedMeshRenderer != null)
+        {
+            skinnedMeshRenderer.SetPropertyBlock(mpb);
+        }
+
+        // Appliquer aux enfants
+        Renderer[] rends = GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (Renderer r in rends)
+        {
+            r.SetPropertyBlock(mpb);
+        }
+    }
     
 
     public void TakeDamage(float damage)
     {
+        if (!isAlive)
+            return;
         health -= damage;
         Debug.Log("Ennemi touché ! Santé restante : " + health);
 
-        // Effet de couleur lors de l'impact
-        Renderer render = GetComponent<Renderer>();
-        if (render)
-        {
-            render.material.color = Color.red;
-            Invoke("ResetColor", 0.1f);
-        }
+        // find all the renderers in the object
+        ColorDamage();
+        Invoke("ResetColor", 0.2f);
         if (IsOwner)
             damageEffect.DamageEffectOn();
-        animator.SetTrigger("Hit");
+        if (DeadBody)
+            animator.SetTrigger("Hit");
         if (health <= 0)
         {
             Die();
@@ -82,15 +106,40 @@ public class Enemy : NetworkBehaviour
 
     void ResetColor()
     {
-        GetComponent<Renderer>().material.color = Color.white;
+        mpb.Clear();
+
+        // Récupérer le SkinnedMeshRenderer principal
+        SkinnedMeshRenderer skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
+        if (skinnedMeshRenderer != null)
+        {
+            skinnedMeshRenderer.SetPropertyBlock(mpb);
+        }
+
+        // Appliquer aux enfants
+        Renderer[] rends = GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (Renderer r in rends)
+        {
+            r.SetPropertyBlock(mpb);
+        }
     }
 
     void Die()
     {
         isAlive = false;
-        GetComponent<Netcode.NetworkPlayer>().enabled = false;
+        Netcode.NetworkPlayer player = GetComponent<Netcode.NetworkPlayer>();
+        if (player)
+            player.enabled = false;
+        else
+            GetComponent<AIControllerBear>().enabled = false;
         if (IsServer) {
             isAliveServ.Value = false;
+        }
+        if (!DeadBody)
+        {
+            animator.SetBool("isAttacking", false);
+            animator.SetBool("isWalking", false);
+            animator.SetBool("isDead", true);
+            return;
         }
         //disable childs
         foreach (Transform child in transform)
@@ -123,9 +172,18 @@ public class Enemy : NetworkBehaviour
     {
         isAlive = true;
         health = 100;
-        GetComponent<Netcode.NetworkPlayer>().enabled = true;
+        Netcode.NetworkPlayer player = GetComponent<Netcode.NetworkPlayer>();
+        if (player)
+            player.enabled = true;
+        else
+            GetComponent<AIControllerBear>().enabled = true;
         if (IsServer) {
             isAliveServ.Value = true;
+        }
+        if (!DeadBody)
+        {
+            animator.SetBool("isDead", false);
+            return;
         }
         //Remove if there is a clone in name
         foreach (Transform child in transform)

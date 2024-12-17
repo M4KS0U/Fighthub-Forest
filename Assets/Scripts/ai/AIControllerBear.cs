@@ -11,6 +11,8 @@ public class AIControllerBear : MonoBehaviour
 
     private Vector3? targetPatrol = null;
 
+    float cd = 0.0f;
+
 
     void Start()
     {
@@ -40,6 +42,29 @@ public class AIControllerBear : MonoBehaviour
         agent.isStopped = true;
         animator.SetBool("isWalking", false);
         animator.SetBool("isAttacking", true);
+        // get current frame
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if (!stateInfo.IsName("Attack"))
+            return;
+
+        float normalizedTime = stateInfo.normalizedTime;
+        normalizedTime -= (int)normalizedTime;
+        cd -= Time.deltaTime;
+        if ((int)(normalizedTime * 10) != 5 || cd >= 0.0f) {
+            return;
+        }
+        cd = 0.5f;
+
+        
+        Transform closestEnemy = FindClosestEnemy();
+        if (closestEnemy == null)
+            return;
+        GameObject enemy = closestEnemy.gameObject;
+        Enemy enemyScript = enemy.GetComponent<Enemy>();
+        if (enemyScript != null)
+        {
+            enemyScript.TakeDamage(20f);
+        }
     }
 
     private bool IsMeleeInRange()
@@ -49,7 +74,7 @@ public class AIControllerBear : MonoBehaviour
         {
             return false;
         }
-        return Vector3.Distance(transform.position, closestEnemy.position) < 1f;
+        return Vector3.Distance(transform.position, closestEnemy.position) < 2f;
     }
 
     bool IsHealthLow()
