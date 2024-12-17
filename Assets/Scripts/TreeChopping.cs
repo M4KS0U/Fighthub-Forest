@@ -7,6 +7,9 @@ public class TreeChopping : MonoBehaviour
     public int treeHealth = 100;
 
     public float choppingRange = 5f;
+
+    private Vector3 originalScale;
+
     private Transform playerTransform;
 
     private void Start()
@@ -20,6 +23,7 @@ public class TreeChopping : MonoBehaviour
         {
             Debug.LogError("Aucun joueur trouvé avec le tag 'Player' !");
         }
+        originalScale = transform.localScale;
     }
 
     // private void Update()
@@ -34,30 +38,34 @@ public class TreeChopping : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (playerTransform != null && CheckChoppingRange() && TreeChopped != null)
+        if (TreeChopped != null)
         {
-            // CheckChoppingRange();
-            treeHealth -= 50;
-            // Reduire la taille de l'arbre
-            if (treeHealth <= 0)
-            {
-                Vector3 clickPosition = GetClickPosition();
-                Vector3 direction = (transform.position - clickPosition).normalized;
-
-                GameObject choppedTree = Instantiate(TreeChopped, transform.position, Quaternion.identity);
-
-                Transform trunk = choppedTree.transform.Find("Trunk");
-                if (trunk != null)
+            if (playerTransform != null && CheckChoppingRange()) {
+                treeHealth -= 50;
+                // Reduire la taille de l'arbre
+                transform.localScale = originalScale * 1.1f;
+                if (treeHealth <= 0)
                 {
-                    Rigidbody rb = trunk.GetComponent<Rigidbody>();
-                    if (rb == null)
-                    {
-                        rb = trunk.gameObject.AddComponent<Rigidbody>();
-                    }
-                    rb.AddForce(direction * fallForce, ForceMode.Impulse);
-                }
+                    Vector3 clickPosition = GetClickPosition();
+                    Vector3 direction = (transform.position - clickPosition).normalized;
 
-                Destroy(gameObject);
+                    GameObject choppedTree = Instantiate(TreeChopped, transform.position, Quaternion.identity);
+
+                    Transform trunk = choppedTree.transform.Find("Trunk");
+                    if (trunk != null)
+                    {
+                        Rigidbody rb = trunk.GetComponent<Rigidbody>();
+                        if (rb == null)
+                        {
+                            rb = trunk.gameObject.AddComponent<Rigidbody>();
+                        }
+                        rb.AddForce(direction * fallForce, ForceMode.Impulse);
+                    }
+
+                    Destroy(gameObject);
+                }
+            } else {
+                Debug.Log ("Trop loiiin");
             }
         }
         else
@@ -65,6 +73,7 @@ public class TreeChopping : MonoBehaviour
             Debug.LogWarning("Aucun objet n'est assign� pour l'instanciation !");
         }
     }
+
     private bool CheckChoppingRange()
     {
         // Vérifie la distance entre le joueur et l'arbre

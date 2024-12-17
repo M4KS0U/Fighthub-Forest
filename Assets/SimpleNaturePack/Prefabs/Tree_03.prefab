@@ -186,8 +186,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5, y: 4.950701, z: 0.5}
-  m_Center: {x: 0, y: 2.4756033, z: 0}
+  m_Size: {x: 0.9659723, y: 4.950701, z: 1.6558845}
+  m_Center: {x: 0.018673614, y: 2.4756033, z: -0.04110396}
 --- !u!1 &6941765000743290380
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,6 +262,7 @@ MonoBehaviour:
   TreeChopped: {fileID: 2606158509978283745, guid: 99137ebd29667a84685c9efdd3d5c36b, type: 3}
   fallForce: 5
   treeHealth: 100
+  choppingRange: 5
 --- !u!65 &1713868500218868567
 BoxCollider:
   m_ObjectHideFlags: 0

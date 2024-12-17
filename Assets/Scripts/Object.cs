@@ -9,8 +9,6 @@ public class Object : MonoBehaviour
     private bool playerInRange;
 
     private Vector3 originalScale;
-    Color m_MouseOverColor = Color.blue;
-    Color m_OriginalColor;
     MeshRenderer m_Renderer;
 
     void Start()
