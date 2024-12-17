@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class TreeChopping : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class TreeChopping : MonoBehaviour
     private Vector3 originalScale;
 
     private Transform playerTransform;
+
+
+    public float shrinkDuration = 0.06f;
+    public float growDuration = 0.06f;
+    public float shrinkScale = 0.99f;
 
     private void Start()
     {
@@ -34,7 +40,33 @@ public class TreeChopping : MonoBehaviour
     //     }
     // }
 
+    public void AnimateTree()
+    {
+        StartCoroutine(ShrinkAndGrow());
+    }
 
+    private IEnumerator ShrinkAndGrow()
+    {
+        // Étape 1 : Rétrécir
+        float elapsedTime = 0f;
+        while (elapsedTime < shrinkDuration)
+        {
+            transform.localScale = Vector3.Lerp(originalScale, originalScale * shrinkScale, elapsedTime / shrinkDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        transform.localScale = originalScale * shrinkScale;
+
+        // Étape 2 : Revenir à la taille normale
+        elapsedTime = 0f;
+        while (elapsedTime < growDuration)
+        {
+            transform.localScale = Vector3.Lerp(originalScale * shrinkScale, originalScale, elapsedTime / growDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        transform.localScale = originalScale;
+    }
 
     void OnMouseDown()
     {
@@ -42,8 +74,9 @@ public class TreeChopping : MonoBehaviour
         {
             if (playerTransform != null && CheckChoppingRange()) {
                 treeHealth -= 50;
+                AnimateTree();
                 // Reduire la taille de l'arbre
-                transform.localScale = originalScale * 1.1f;
+                // transform.localScale = originalScale / 1.1f;
                 if (treeHealth <= 0)
                 {
                     Vector3 clickPosition = GetClickPosition();

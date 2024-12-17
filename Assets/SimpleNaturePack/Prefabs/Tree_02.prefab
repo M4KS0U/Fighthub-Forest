@@ -260,9 +260,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TreeChopped: {fileID: 790897064512580519, guid: 44a358e292e3c2b4aa42902220e7f030, type: 3}
-  fallForce: 15
+  fallForce: 10
   treeHealth: 100
-  choppingRange: 5
+  choppingRange: 3
 --- !u!65 &1884794922365848862
 BoxCollider:
   m_ObjectHideFlags: 0
