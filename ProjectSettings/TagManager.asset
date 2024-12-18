@@ -6,6 +6,10 @@ TagManager:
   tags:
   - CinemachineTarget
   - Ground
+  - Sword
+  - Pistol
+  - BorderLimit
+  - Enemy
   layers:
   - Default
   - TransparentFX

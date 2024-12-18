@@ -62,17 +62,22 @@ namespace Netcode
         private int _animIDFreeFall;
         private int _animIDMotionSpeed;
 
+        private int _animIDDodge;
+
         private float _speed;
         private float _rotationVelocity;
         private float _animationBlend;
         private float _targetRotation = 0.0f;
         private bool _spawnedGrounded;
 
+        private float _timeDogde = 1.0f;
+
         // Networked variables to sync animation
         public NetworkVariable<float> NetworkedSpeed = new NetworkVariable<float>();
         public NetworkVariable<bool> NetworkedGrounded = new NetworkVariable<bool>();
         public NetworkVariable<bool> NetworkedJump = new NetworkVariable<bool>();
         public NetworkVariable<bool> NetworkedFreeFall = new NetworkVariable<bool>();
+        public NetworkVariable<bool> NetworkedDodge = new NetworkVariable<bool>();
 
         private bool _hasAnimator;
 
@@ -142,6 +147,7 @@ namespace Netcode
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+            _animIDDodge = Animator.StringToHash("Dodge");
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -154,6 +160,13 @@ namespace Netcode
             NetworkedFreeFall.Value = freeFall;
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        private void UpdateDodgeServerRpc(bool dodge)
+        {
+            // Server updates the networked values
+            NetworkedDodge.Value = dodge;
+        }
+
         private Vector3 GetRandomPositionOnMap()
         {
             // Generate a random position within the defined map bounds
@@ -164,6 +177,7 @@ namespace Netcode
             // Ensure the random position is grounded
             if (Physics.Raycast(new Vector3(randomX, 10f, randomZ), Vector3.down, out RaycastHit hit, Mathf.Infinity, GroundLayers))
             {
+                Debug.Log($"THe player is spawning on the {hit.collider.gameObject.name}");
                 randomPosition.y = hit.point.y;
             }
 
@@ -197,17 +211,41 @@ namespace Netcode
             }
         }
 
+        Vector2 MoveInput()
+        {
+            // horizontal
+            float moveX = Input.GetAxis("Horizontal");
+            // vertical
+            float moveY = Input.GetAxis("Vertical");
+
+            return new Vector2(moveX, moveY);
+        }
+
+        bool JumpInput()
+        {
+            if (!Grounded)
+            {
+                return false;
+            }
+            return Input.GetButtonDown("Jump");
+        }
+
+        bool SprintInput()
+        {
+            return Input.GetButton("Run");
+        }
+
         private void Move()
         {
             if (!IsOwner) return;
 
-            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            float targetSpeed = SprintInput() ? SprintSpeed : MoveSpeed;
 
-            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+            if (MoveInput() == Vector2.zero) targetSpeed = 0.0f;
 
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
             float speedOffset = 0.1f;
-            float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+            float inputMagnitude = _input.analogMovement ? MoveInput().magnitude : 1f;
 
             if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
             {
@@ -222,9 +260,9 @@ namespace Netcode
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            Vector3 inputDirection = new Vector3(MoveInput().x, 0.0f, MoveInput().y).normalized;
 
-            if (_input.move != Vector2.zero)
+            if (MoveInput() != Vector2.zero)
             {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
@@ -232,6 +270,22 @@ namespace Netcode
             }
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+            // left click to dodge
+            if (Input.GetMouseButtonDown(1) && !stateInfo.IsName("Dodge")) {
+                UpdateDodgeServerRpc(true);
+                _timeDogde = 0.0f;
+            }
+
+
+            // Comparer le nom de l'état
+            if (_timeDogde < 0.6f) {
+                if (_timeDogde > 0.05f) {
+                    UpdateDodgeServerRpc(false);
+                    _speed = 10f;
+                }
+                _timeDogde += Time.deltaTime;
+            }
 
             // Apply movement locally
             if (_spawnedGrounded)
@@ -259,7 +313,7 @@ namespace Netcode
 
             if (Vector3.Distance(transform.position, clientPosition) > correctionThreshold)
             {
-                Debug.Log($"Server correcting position from {clientPosition} to {transform.position}");
+//                Debug.Log($"Server correcting position from {clientPosition} to {transform.position}");
                 
                 // Update the client to match the server's position
                 UpdatePositionClientRpc(transform.position, clientRotation);
@@ -328,7 +382,7 @@ namespace Netcode
                     _verticalVelocity = -2f;
                 }
 
-                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                if (JumpInput() && _jumpTimeoutDelta <= 0.0f)
                 {
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
                     if (_hasAnimator) _animator.SetBool(_animIDJump, true);
@@ -348,8 +402,6 @@ namespace Netcode
                 {
                     _animator.SetBool(_animIDFreeFall, true);
                 }
-
-                _input.jump = false;
             }
 
             if (_verticalVelocity < 53.0f)
@@ -365,7 +417,8 @@ namespace Netcode
                 if (IsOwner)
                 {
                     _animator.SetFloat(_animIDSpeed, _animationBlend);
-                    _animator.SetFloat(_animIDMotionSpeed, _input.analogMovement ? _input.move.magnitude : 1f);
+                    _animator.SetFloat(_animIDMotionSpeed, _input.analogMovement ? MoveInput().magnitude : 1f);
+                    _animator.SetBool(_animIDDodge, NetworkedDodge.Value);
                 }
                 else
                 {
@@ -374,6 +427,7 @@ namespace Netcode
                     _animator.SetBool(_animIDGrounded, NetworkedGrounded.Value);
                     _animator.SetBool(_animIDJump, NetworkedJump.Value);
                     _animator.SetBool(_animIDFreeFall, NetworkedFreeFall.Value);
+                    _animator.SetBool(_animIDDodge, NetworkedDodge.Value);
                 }
             }
         }
